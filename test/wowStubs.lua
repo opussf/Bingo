@@ -1,7 +1,7 @@
 -----------------------------------------
 -- Author  :  Opussf
--- Date    :  October 26 2025
--- Revision:  9.5.1-20-g703e555
+-- Date    :  November 02 2025
+-- Revision:  9.5.1-23-ga29597d
 -----------------------------------------
 -- These are functions from wow that have been needed by addons so far
 -- Not a complete list of the functions.
@@ -1704,7 +1704,9 @@ function UnitLevel( who )
 	return unitLevels[who]
 end
 function UnitName( who )
-	return Units[who].name, Units[who].realm
+	if Units[who] then
+		return Units[who].name, Units[who].realm
+	end
 end
 function UnitPowerMax( who, powerType )
 	-- http://wowwiki.wikia.com/wiki/API_UnitPowerMax
@@ -2538,8 +2540,14 @@ function ParseTOC( tocFile, useRequire )
 		local tocContents = f:read( "*all" )
 		for line in tocContents:gmatch("([^\n]*)\n?") do
 			if line ~= "" then
-				local luaFile = line:match("([_%a][_%w]*)%.lua")
-				local xmlFile = line:match("([_%a][_%w]*)%.xml")
+				local luaFile = line:match("([%w%._%-\\/]+)%.lua")
+				if luaFile then
+					luaFile = luaFile:gsub("\\", "/") -- normalize to forward slashes
+				end
+				local xmlFile = line:match("([%w%._%-\\/]+)%.xml")
+				if xmlFile then
+					xmlFile = xmlFile:gsub("\\", "/") -- normalize to forward slashes
+				end
 				local hashKey, hashValue = line:match("## ([_%a]*): (.*)")
 
 				if hashKey then
