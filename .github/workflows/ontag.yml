@@ -39,7 +39,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "./target/*.zip*"
-          body: target/working/changelog.txt
-          release_name: Release ${{ github.ref }}
+          bodyFile: target/working/changelog.txt
+          name: Release ${{ github.ref }}
           draft: false
           prerelease: false
