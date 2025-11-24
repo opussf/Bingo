@@ -1,5 +1,10 @@
-.DS_Store
+# build artifacts
 target/
-INeed-cf/
+coverage.xml
+Bingo-cf/
 
-*.sublime*
+# Mac files
+.DS_Store
+
+# Misc
+runmany.sh
