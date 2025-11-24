@@ -1,0 +1,10 @@
+## Title: Guild Bingo
+## Notes: Plays a game of Bingo in guild
+## Interface: @INTERFACE@
+## Author: opussf
+## Version: @VERSION@
+## Description: Plays a game of Bingo in guild
+## SavedVariables:
+## SavedVariablesPerCharacter:
+Bingo.lua
+Bingo.xml
