@@ -3,15 +3,11 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\..\FrameXML\UI.xsd">
 
-	<Frame name="Bingo_Frame" frameStrata="BACKGROUND" toplevel="false" enableMouse="false" movable="false" parent="UIParent">
+	<Frame name="BingoFrame" frameStrata="BACKGROUND" toplevel="false" enableMouse="false" movable="false" parent="UIParent">
 		<Scripts>
-			<OnLoad>
-				Bingo.OnLoad();
-				self:Hide();
-			</OnLoad>
-			<OnEvent>
-				Bingo[event](self, ...)
-			</OnEvent>
+			<OnLoad>Bingo.OnLoad()</OnLoad>
+			<OnUpdate>Bingo.OnUpdate()</OnUpdate>
+			<OnEvent>Bingo[event](self, ...)</OnEvent>
 		</Scripts>
 	</Frame>
 </Ui>

@@ -1,4 +1,4 @@
-## Title: Guild Bingo
+## Title: Bingo
 ## Notes: Plays a game of Bingo in guild
 ## Interface: @INTERFACE@
 ## Author: opussf
