@@ -46,8 +46,7 @@ function test.test_SendMessage_sent_str()
 	Bingo_CurrentGame.channel = "party"
 	-- SendMessages uses the choosen game channel
 	Bingo.SendMessage( "Hello there" )
-	test.dump(chatLog)
-
+	assertEquals( "Hello there", chatLog[1].msg )
 end
 
 test.run()

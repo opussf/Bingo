@@ -38,7 +38,6 @@ end
 function Bingo.SendMessage( msg )
 	if type( msg ) == "string" then
 		SendChatMessage(msg, "EMOTE")
-
 	elseif type( msg ) == "table" then
 	end
 end
@@ -68,7 +67,7 @@ end
 function Bingo.PLAYER_ENTERING_WORLD()
 	Bingo.RegisterEvents()
 end
-function Bingo.OnUpdate()
+function Bingo.OnUpdate( elapsed )
 	if Bingo_CurrentGame and Bingo_CurrentGame.initAt and not Bingo_CurrentGame.endedAt then
 		Bingo.Print("Game exists, and not ended")
 		if Bingo_CurrentGame.players then

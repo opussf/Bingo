@@ -6,7 +6,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 	<Frame name="BingoFrame" frameStrata="BACKGROUND" toplevel="false" enableMouse="false" movable="false" parent="UIParent">
 		<Scripts>
 			<OnLoad>Bingo.OnLoad()</OnLoad>
-			<OnUpdate>Bingo.OnUpdate()</OnUpdate>
+			<OnUpdate>Bingo.OnUpdate(elapsed)</OnUpdate>
 			<OnEvent>Bingo[event](self, ...)</OnEvent>
 		</Scripts>
 	</Frame>
