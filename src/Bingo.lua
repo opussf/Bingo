@@ -66,6 +66,9 @@ function Bingo.QueueMessage( msg, target )
 end
 function Bingo.SendMessage( msg, target )
 	-- guild, raid, party, general
+	if not target or target == "" then
+		target = Bingo_CurrentGame.channel or "pick a default"
+	end
 	local chatChannel, toWhom
 	if target then
 		if target == "guild" and IsInGuild() then
@@ -170,11 +173,6 @@ function Bingo.CHAT_MSG_WHISPER( self, msg, sender )
 end
 function Bingo.CHAT_MSG_( self, msg, sender )
 	Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
-	if string.find( msg, "!join" ) then
-		if not Bingo_CurrentGame.players[sender] then
-			Bingo_CurrentGame.players[sender] = 1
-		end
-	end
 
 end
 Bingo.CHAT_MSG_GUILD = Bingo.CHAT_MSG_

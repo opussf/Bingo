@@ -8,11 +8,12 @@ test.coverageReportPercent = true
 ParseTOC( "../src/Bingo.toc" )
 
 function test.before()
-    chatLog = {}
-    Bingo_PlayerCards = {}
+	chatLog = {}
+	Bingo_PlayerCards = {}
 	Bingo_CurrentGame = {}
-    Bingo.OnLoad()
-    Bingo.PLAYER_ENTERING_WORLD()
+	Bingo.messageQueue = {}
+	Bingo.OnLoad()
+	Bingo.PLAYER_ENTERING_WORLD()
 end
 function test.after()
 end
@@ -42,12 +43,27 @@ function test.test_start_GameStillRunning()
 	Bingo.Command("guild")
 	assertEquals( "party", Bingo_CurrentGame.channel )
 end
--- function test.test_SendMessage_sent_str()
--- 	Bingo_CurrentGame.channel = "party"
--- 	-- SendMessages uses the choosen game channel
--- 	Bingo.SendMessage( "Hello there" )
--- 	assertEquals( "Hello there", chatLog[1].msg )
--- end
+function test.test_SendMessage_sent_str()
+	Bingo_CurrentGame.channel = "say"
+	-- SendMessages uses the choosen game channel
+	Bingo.SendMessage( "Hello there" )
+	assertEquals( "Hello there", chatLog[1].msg )
+	assertEquals( "SAY", chatLog[1].chatType )
+end
+function test.test_queueMessage_goesIntoQueue()
+	Bingo.QueueMessage( "Plushie", "say" )
+	assertEquals( "Plushie", Bingo.messageQueue["say"].queue[1] )
+	assertAlmostEquals( time(), Bingo.messageQueue["say"].last )
+end
+function test.test_queueMessage_isPosted()
+	Bingo.messageQueue["say"] = { queue = {"kindle"}, last = time()-5 }
+	Bingo.OnUpdate()
+	assertEquals( "kindle", chatLog[1].msg )
+	assertEquals( "SAY", chatLog[1].chatType )
+end
+
+
+
 
 test.run()
 
