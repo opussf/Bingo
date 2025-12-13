@@ -1,7 +1,7 @@
 -----------------------------------------
 -- Author  :  Opussf
--- Date    :  November 24 2025
--- Revision:  9.7.1-1-ge9b1efd
+-- Date    :  December 01 2025
+-- Revision:  9.7.1-2-g52b7d63
 -----------------------------------------
 -- These are functions from wow that have been needed by addons so far
 -- Not a complete list of the functions.
@@ -666,7 +666,7 @@ FrameEditBox = {
 }
 function CreateEditBox( name, ... )
 	me = {}
-	for k,v in pairs(EditBox) do
+	for k,v in pairs(FrameEditBox) do
 		me[k] = v
 	end
 	me.name = name
