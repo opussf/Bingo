@@ -97,7 +97,7 @@ function Bingo.OnLoad()
 end
 function Bingo.PLAYER_ENTERING_WORLD()
 	Bingo.RegisterEvents()
-	math.randomseed(time())
+	-- math.randomseed(time())
 end
 function Bingo.OnUpdate( elapsed )
 	-- handle message Queue
@@ -148,7 +148,7 @@ end
 function Bingo.FNV1a(str)
     local hash = 2166136261
     for i = 1, #str do
-        hash = hash ~ str:byte(i)
+        hash = bit.bxor(hash, str:byte(i))
         hash = (hash * 16777619) % 2^32
     end
     return string.format("%08x", hash)
