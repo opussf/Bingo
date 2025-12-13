@@ -59,9 +59,39 @@ function test.test_queueMessage_isPosted()
 	Bingo.messageQueue["say"] = { queue = {"kindle"}, last = time()-5 }
 	Bingo.OnUpdate()
 	assertEquals( "kindle", chatLog[1].msg )
+end
+function test.test_queueMessage_isPosted_toSay()
+	Bingo.messageQueue["say"] = { queue = {"kindle"}, last = time()-5 }
+	Bingo.OnUpdate()
 	assertEquals( "SAY", chatLog[1].chatType )
 end
-
+function test.test_queueMessage_isPosted_isCleared()
+	Bingo.messageQueue["say"] = { queue = {"kindle"}, last = time()-5 }
+	Bingo.OnUpdate()
+	assertIsNil( Bingo.messageQueue["say"] )
+end
+function test.test_bangCommands_help_toPlayer()
+	Bingo.CHAT_MSG_WHISPER( {}, "!help", "Otherplayer-Other Realm" )
+	assertTrue( Bingo.messageQueue["Otherplayer-Other Realm"] )
+end
+function test.test_bangCommands_help_queue_has_6()
+	Bingo.CHAT_MSG_WHISPER( {}, "!help", "Otherplayer-Other Realm" )
+	assertEquals( 6, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
+end
+function test.test_bangCommands_cards_one()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
+	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	assertEquals( 8, string.len(hash) )
+	assertTrue( type(card) == "table" )
+end
+function test.test_bangCommands_cards_ten()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
+	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	assertEquals( 8, string.len(hash) )
+	assertTrue( type(card) == "table" )
+end
 
 
 
@@ -123,5 +153,6 @@ function StripDice.GROUP_ROSTER_UPDATE()
 		StripDice.gameActive = true
 	end
 end
+
 
 ]]
