@@ -42,12 +42,12 @@ function test.test_start_GameStillRunning()
 	Bingo.Command("guild")
 	assertEquals( "party", Bingo_CurrentGame.channel )
 end
-function test.test_SendMessage_sent_str()
-	Bingo_CurrentGame.channel = "party"
-	-- SendMessages uses the choosen game channel
-	Bingo.SendMessage( "Hello there" )
-	assertEquals( "Hello there", chatLog[1].msg )
-end
+-- function test.test_SendMessage_sent_str()
+-- 	Bingo_CurrentGame.channel = "party"
+-- 	-- SendMessages uses the choosen game channel
+-- 	Bingo.SendMessage( "Hello there" )
+-- 	assertEquals( "Hello there", chatLog[1].msg )
+-- end
 
 test.run()
 
