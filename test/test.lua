@@ -99,6 +99,11 @@ function test.test_bangCommands_cards_overMax()
 	assertEquals( 8, string.len(hash) )
 	assertTrue( type(card) == "string" )
 end
+function test.test_bangCommands_cards_zeroReturnsAllCards()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 0", "Otherplayer-Other Realm" )
+	assertIsNil( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+end
 function test.test_bangCommand_list_noCards()
 	Bingo.CHAT_MSG_WHISPER( {}, "!list", "Otherplayer-Other Realm" )
 	assertEquals( "You have no cards to list.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[1] )
@@ -161,6 +166,13 @@ function test.test_bangCommands_return_tenCards()
 	Bingo.CHAT_MSG_WHISPER( {}, "!return "..hash, "Otherplayer-Other Realm" )
 	assertEquals( hash.." has been returned.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[61] )
 	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"], "Player should still be listed." )
+end
+function test.test_bangCommands_return_all_tenCards()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
+	Bingo.CHAT_MSG_WHISPER( {}, "!return all", "Otherplayer-Other Realm" )
+	test.dump(Bingo.messageQueue)
+	assertEquals( "All of your cards have been returned.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[61] )
+	assertIsNil( Bingo_PlayerCards["Otherplayer-Other Realm"], "Player should not be listed if they have no cards left." )
 end
 
 test.run()

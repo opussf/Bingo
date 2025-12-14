@@ -228,19 +228,24 @@ end
 function Bingo.AssignCards( player, minNumber )  -- !cards
 	Bingo.Print( "AssignCards( "..player..", "..(minNumber or "nil").." )" )
 	if minNumber then
-		minNumber = math.min( tonumber(minNumber), Bingo.cardLimit )
-		-- count the number of cards that the player has
-		local cardCount = 0
-		for hash, _ in pairs( Bingo_PlayerCards[player] or {} ) do
-			cardCount = cardCount + 1
-			Bingo.Print( cardCount.." -> "..hash )
-		end
-		Bingo_PlayerCards[player] = Bingo_PlayerCards[player] or {}
-		for cardNum = cardCount+1, minNumber do
-			-- Bingo.Print( "Make card "..cardNum )
-			local hash, newCard = Bingo.MakeCard()
-			Bingo_PlayerCards[player][hash] = newCard
-			Bingo.ShowCard( player, hash )
+		minNumber = tonumber(minNumber)
+		if minNumber > 0 then
+			minNumber = math.min( minNumber, Bingo.cardLimit )
+			-- count the number of cards that the player has
+			local cardCount = 0
+			for hash, _ in pairs( Bingo_PlayerCards[player] or {} ) do
+				cardCount = cardCount + 1
+				Bingo.Print( cardCount.." -> "..hash )
+			end
+			Bingo_PlayerCards[player] = Bingo_PlayerCards[player] or {}
+			for cardNum = cardCount+1, minNumber do
+				-- Bingo.Print( "Make card "..cardNum )
+				local hash, newCard = Bingo.MakeCard()
+				Bingo_PlayerCards[player][hash] = newCard
+				Bingo.ShowCard( player, hash )
+			end
+		else -- minNumber = 0
+			Bingo.ReturnCard( player, "all" )
 		end
 	else
 		Bingo.ListCards( player )
@@ -285,14 +290,17 @@ end
 function Bingo.ReturnCard( player, hash )  -- !return
 	Bingo.Print( "ReturnCard( "..player..", "..(hash or "nil").." )" )
 	if Bingo_PlayerCards[player] then
-		if Bingo_PlayerCards[player][hash] then
+		if hash == "all" then
+			Bingo_PlayerCards[player] = nil
+			Bingo.QueueMessage( "All of your cards have been returned.", player )
+		elseif Bingo_PlayerCards[player][hash] then
 			Bingo_PlayerCards[player][hash] = nil
 			Bingo.QueueMessage( hash.." has been returned.", player )
+			if not next(Bingo_PlayerCards[player]) then
+				Bingo_PlayerCards[player] = nil
+			end
 		else
 			Bingo.QueueMessage( hash.." is not one of your cards.", player )
-		end
-		if not next(Bingo_PlayerCards[player]) then
-			Bingo_PlayerCards[player] = nil
 		end
 	else
 		Bingo.QueueMessage( "You have no cards to return.", player )
