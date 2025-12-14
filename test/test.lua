@@ -173,64 +173,104 @@ function test.test_bangCommands_return_all_tenCards()
 	assertEquals( "All of your cards have been returned.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[61] )
 	assertIsNil( Bingo_PlayerCards["Otherplayer-Other Realm"], "Player should not be listed if they have no cards left." )
 end
+function test.test_windetect_row1()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [14] = true, [23] = true, [43] = true, [49] = true, [67] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_row2()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [10] = true, [19] = true, [40] = true, [59] = true, [73] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_row3() -- has free spot
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [5] = true, [30] = true, [46] = true, [72] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_row4()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [1] = true, [29] = true, [31] = true, [57] = true, [68] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_row5_withExtras()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [1] = true, [5] = true, [9] = true, [17] = true, [37] = true, [58] = true, [66] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_col3_withExtras()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [1] = true, [5] = true, [9] = true, [30] = true, [17] = true, [37] = true, [46] = true, [72] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_diag1_withExtras()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [1] = true, [14] = true, [19] = true, [57] = true, [66] = true, }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+
+
 
 test.run()
 
 
 --[[
-
-
-Bingo_CurrentGame.picked = {
-	["B1"] = true
-
-}
-
-Bingo_CurrentGame.player = {
-	["player"] =
-}
-
-Send alert to start a game.
-
-
-"LETS PLAY BINGO!"
-"Please /whisper me if you want instuctions."
-
-
-
-
-function StripDice.GROUP_ROSTER_UPDATE()
-	local NumGroupMembers = GetNumGroupMembers()
-	if( NumGroupMembers == 0 ) then  -- turn off listening
-		if( StripDice.gameActive ) then
-			StripDice.LogMsg( "Deactivating Dice game.", 4 )
-		end
-		StripDiceFrame:UnregisterEvent( "CHAT_MSG_SYSTEM" )
-		StripDiceFrame:UnregisterEvent( "CHAT_MSG_SAY" )
-		StripDiceFrame:UnregisterEvent( "CHAT_MSG_PARTY" )
-		StripDiceFrame:UnregisterEvent( "CHAT_MSG_PARTY_LEADER" )
-		StripDiceFrame:UnregisterEvent( "CHAT_MSG_RAID" )
-		StripDiceFrame:UnregisterEvent( "CHAT_MSG_RAID_LEADER" )
-		StripDiceFrame:UnregisterEvent( "CHAT_MSG_RAID_WARNING" )
-		StripDiceFrame:UnregisterEvent( "CHAT_MSG_INSTANCE_CHAT" )
-		StripDiceFrame:UnregisterEvent( "CHAT_MSG_INSTANCE_CHAT_LEADER" )
-		StripDiceFrame:UnregisterEvent( "CHAT_MSG_YELL" )
-		StripDice.StopGame()
-		StripDice.gameActive = nil
-	elseif( NumGroupMembers > 0 and not StripDice.gameActive ) then
-		StripDice.LogMsg( "Dice game is active with "..NumGroupMembers.." in the group.", 4 )
-		StripDiceFrame:RegisterEvent( "CHAT_MSG_SYSTEM" )
-		StripDiceFrame:RegisterEvent( "CHAT_MSG_SAY" )
-		StripDiceFrame:RegisterEvent( "CHAT_MSG_PARTY" )
-		StripDiceFrame:RegisterEvent( "CHAT_MSG_PARTY_LEADER" )
-		StripDiceFrame:RegisterEvent( "CHAT_MSG_RAID" )
-		StripDiceFrame:RegisterEvent( "CHAT_MSG_RAID_LEADER" )
-		StripDiceFrame:RegisterEvent( "CHAT_MSG_RAID_WARNING" )
-		StripDiceFrame:RegisterEvent( "CHAT_MSG_INSTANCE_CHAT" )
-		StripDiceFrame:RegisterEvent( "CHAT_MSG_INSTANCE_CHAT_LEADER" )
-		StripDiceFrame:RegisterEvent( "CHAT_MSG_YELL" )
-		StripDice.gameActive = true
-	end
-end
 
 
 ]]
