@@ -10,6 +10,7 @@ Bingo.COLOR = {
 
 Bingo.cardLimit = 10  -- make this a configure option soonish
 Bingo.ballDelaySeconds = 6
+Bingo.gameEndDelaySeconds = 30
 
 -- Init saved variables
 Bingo_PlayerCards = {}  -- { ["player"] = {["hash"] = {{2d array of card}} } }
@@ -131,8 +132,8 @@ function Bingo.OnUpdate( elapsed )
 		if Bingo_CurrentGame.lastBallAt and Bingo_CurrentGame.lastBallAt + Bingo.ballDelaySeconds <= time() then
 			Bingo.CallBall()
 			if #Bingo_CurrentGame.ball == 0 then
-				Bingo_CurrentGame.endedAt = time() + 15
-				Bingo.QueueMessage( "That was the last ball. You have 15 seconds till end of game." )
+				Bingo_CurrentGame.endedAt = time() + Bingo.gameEndDelaySeconds
+				Bingo.QueueMessage( "That was the last ball. You have "..Bingo.gameEndDelaySeconds.." seconds till end of game." )
 			end
 		end
 	end
