@@ -226,7 +226,7 @@ function Bingo.MakeCard()
 	return hash, cardString
 end
 function Bingo.AssignCards( player, minNumber )  -- !cards
-	Bingo.Print( "AssignCards( "..player..", "..(minNumber or nil).." )" )
+	Bingo.Print( "AssignCards( "..player..", "..(minNumber or "nil").." )" )
 	if minNumber then
 		minNumber = math.min( tonumber(minNumber), Bingo.cardLimit )
 		-- count the number of cards that the player has
@@ -258,7 +258,7 @@ function Bingo.ListCards( player )  -- !list
 	end
 end
 function Bingo.ShowCard( player, hash )  -- !show
-	Bingo.Print( "ShowCard( "..player..", "..(hash or nil).." )" )
+	Bingo.Print( "ShowCard( "..player..", "..(hash or "nil").." )" )
 	local cardQueue = {}
 	if Bingo_PlayerCards[player] then
 		local cardStr = Bingo_PlayerCards[player][hash]
@@ -280,6 +280,22 @@ function Bingo.ShowCard( player, hash )  -- !show
 		end
 	else
 		Bingo.QueueMessage( "You have no cards.", player )
+	end
+end
+function Bingo.ReturnCard( player, hash )  -- !return
+	Bingo.Print( "ReturnCard( "..player..", "..(hash or "nil").." )" )
+	if Bingo_PlayerCards[player] then
+		if Bingo_PlayerCards[player][hash] then
+			Bingo_PlayerCards[player][hash] = nil
+			Bingo.QueueMessage( hash.." has been returned.", player )
+		else
+			Bingo.QueueMessage( hash.." is not one of your cards.", player )
+		end
+		if not next(Bingo_PlayerCards[player]) then
+			Bingo_PlayerCards[player] = nil
+		end
+	else
+		Bingo.QueueMessage( "You have no cards to return.", player )
 	end
 end
 function Bingo.RegisterEvents()
@@ -392,13 +408,5 @@ Bingo.bangCommands = {
 	["!card"] = Bingo.AssignCards,
 	["!list"] = Bingo.ListCards,
 	["!show"] = Bingo.ShowCard,
-
-
-
-	-- ["!cards"] = functionkjsdhfkj
-
-	-- "!cards 0 - will return all of your cards.",
-	-- "!list - list the card hashes",
-	-- "!show <comma seperated list of hashes> - shows cards that start with the hash. no list shows all cards",
-	-- "!return
+	["!return"] = Bingo.ReturnCard,
 }
