@@ -396,6 +396,10 @@ function Bingo.RegisterEvents()
 		BingoFrame:RegisterEvent( "CHAT_MSG_GUILD" )
 	elseif Bingo_CurrentGame.channel == "say" then
 		BingoFrame:RegisterEvent( "CHAT_MSG_SAY" )
+		BingoFrame:RegisterEvent( "CHAT_MSG_YELL" )
+	elseif Bingo_CurrentGame.channel == "yell" then
+		BingoFrame:RegisterEvent( "CHAT_MSG_SAY" )
+		BingoFrame:RegisterEvent( "CHAT_MSG_YELL" )
 	elseif Bingo_CurrentGame.channel == "raid" then
 		BingoFrame:RegisterEvent( "CHAT_MSG_PARTY" )
 		BingoFrame:RegisterEvent( "CHAT_MSG_PARTY_LEADER" )
@@ -411,6 +415,7 @@ end
 function Bingo.UnregisterEvents()
 	BingoFrame:UnregisterEvent( "CHAT_MSG_GUILD" )
 	BingoFrame:UnregisterEvent( "CHAT_MSG_SAY" )
+	BingoFrame:UnregisterEvent( "CHAT_MSG_YELL" )
 	BingoFrame:UnregisterEvent( "CHAT_MSG_PARTY" )
 	BingoFrame:UnregisterEvent( "CHAT_MSG_PARTY_LEADER" )
 	BingoFrame:UnregisterEvent( "CHAT_MSG_RAID" )
@@ -439,6 +444,7 @@ function Bingo.CHAT_MSG_( self, msg, sender )
 	end
 end
 Bingo.CHAT_MSG_SAY = Bingo.CHAT_MSG_
+Bingo.CHAT_MSG_YELL = Bingo.CHAT_MSG_
 Bingo.CHAT_MSG_GUILD = Bingo.CHAT_MSG_
 Bingo.Chat_MSG_PARTY = Bingo.CHAT_MSG_
 Bingo.Chat_MSG_PARTY_LEADER = Bingo.CHAT_MSG_
@@ -508,6 +514,10 @@ Bingo.commandList = {
 	["say"] = {
 		["func"] = function() Bingo.StartGame("say") end,
 		["help"] = {"", "Start game in say chat"},
+	},
+	["yell"] = {
+		["func"] = function() Bingo.StartGame("yell") end,
+		["help"] = {"", "Start game in yell chat"},
 	},
 	["reset"] = {
 		["func"] = Bingo.ResetGame,
