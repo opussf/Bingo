@@ -53,7 +53,7 @@ end
 function test.test_queueMessage_goesIntoQueue()
 	Bingo.QueueMessage( "Plushie", "say" )
 	assertEquals( "Plushie", Bingo.messageQueue["say"].queue[1] )
-	assertAlmostEquals( time(), Bingo.messageQueue["say"].last )
+	assertAlmostEquals( time()-1, Bingo.messageQueue["say"].last )
 end
 function test.test_queueMessage_isPosted()
 	Bingo.messageQueue["say"] = { queue = {"kindle"}, last = time()-5 }
@@ -92,7 +92,24 @@ function test.test_bangCommands_cards_ten()
 	assertEquals( 8, string.len(hash) )
 	assertTrue( type(card) == "string" )
 end
-
+function test.test_bangCommand_list_noCards()
+	Bingo.CHAT_MSG_WHISPER( {}, "!list", "Otherplayer-Other Realm" )
+	assertEquals( "You have no cards to list.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[1] )
+end
+function test.test_bangCommand_list_oneCard()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
+	Bingo.CHAT_MSG_WHISPER( {}, "!list", "Otherplayer-Other Realm" )
+	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	assertEquals( hash, Bingo.messageQueue["Otherplayer-Other Realm"].queue[7] )
+end
+function test.test_bangCommand_list_tenCards()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
+	Bingo.CHAT_MSG_WHISPER( {}, "!list", "Otherplayer-Other Realm" )
+	test.dump(chatLog)
+	test.dump(Bingo.messageQueue)
+	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	assertEquals( 70, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
+end
 
 
 test.run()

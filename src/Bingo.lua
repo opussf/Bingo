@@ -56,7 +56,7 @@ function Bingo.QueueMessage( msg, target )
 	if not target or target == "" then
 		target = Bingo_CurrentGame.channel or "pick a default"
 	end
-	Bingo.messageQueue[target] = Bingo.messageQueue[target] or { queue = {}, last = time() }
+	Bingo.messageQueue[target] = Bingo.messageQueue[target] or { queue = {}, last = time()-1 }
 
 	if type( msg ) == "string" then
 		table.insert( Bingo.messageQueue[target].queue, msg )
@@ -249,8 +249,12 @@ end
 function Bingo.ListCards( player )  -- !list
 	Bingo.Print( "ListCards( "..player.." )" )
 	-- list card hashes
-	for hash, _ in Bingo.spairs( Bingo_PlayerCards[player] ) do
-		Bingo.QueueMessage( hash, player )
+	if Bingo_PlayerCards[player] then
+		for hash, _ in Bingo.spairs( Bingo_PlayerCards[player] ) do
+			Bingo.QueueMessage( hash, player )
+		end
+	else
+		Bingo.QueueMessage( "You have no cards to list.", player )
 	end
 end
 function Bingo.ShowCard( player, hash )  -- !show
