@@ -322,6 +322,75 @@ function Bingo.ReturnCard( player, hash )  -- !return
 		Bingo.QueueMessage( "You have no cards to return.", player )
 	end
 end
+function Bingo.MakeWinMasks()
+	-- masks are bit places
+	-- 0, 5, 10, 15, 20
+	-- 1, 6, 11, 16, 21
+	-- 2, 7, 12, 17, 22,
+	-- 3, 8, 13, 18, 23,
+	-- 4, 9, 14, 19, 24
+	Bingo.WIN_MASKS = {}
+
+	-- columns
+	for c = 0, 4 do
+		local mask = 0
+		for r = 0, 4 do
+			-- mask = mask | (1 << ( r * 5 + c ))
+			mask = bit.bor( mask, bit.lshift(1, (c*5+r)) )
+		end
+		table.insert( Bingo.WIN_MASKS, mask )
+	end
+	-- rows
+	for r = 0, 4 do
+		local mask = 0
+		for c = 0, 4 do
+			mask = bit.bor( mask, bit.lshift(1, (c*5+r)) )
+		end
+		table.insert( Bingo.WIN_MASKS, mask )
+	end
+	-- Diagonals
+	table.insert( Bingo.WIN_MASKS, bit.bor( bit.lshift( 1, 0 ),
+							 	bit.bor( bit.lshift( 1, 6 ),
+							 		bit.bor( bit.lshift( 1, 12 ),
+							 			bit.bor( bit.lshift( 1, 18),
+							 				bit.lshift( 1, 24 ) ) ) ) ) )
+	table.insert( Bingo.WIN_MASKS, bit.bor( bit.lshift( 1, 4 ),
+								bit.bor( bit.lshift( 1, 8 ),
+									bit.bor( bit.lshift( 1, 12 ),
+										bit.bor( bit.lshift( 1, 16 ),
+											bit.lshift( 1, 20 ) ) ) ) ) )
+end
+function Bingo.CheckForWinningCard( player )
+	Bingo.Print( "CheckForWinningCard( "..player.." )" )
+	if not Bingo.WIN_MASKS then
+		Bingo.MakeWinMasks()
+	end
+
+	for hash, cardStr in pairs( Bingo_PlayerCards[player] ) do
+		local bitCard = bit.lshift(1, 12)  -- set the free spot
+
+		-- print( hash, cardStr, bitCard )
+		local cardArray = Bingo.CardStrToArray( cardStr )
+		for place, value in ipairs( cardArray ) do
+			value = tonumber( value )
+			if Bingo_CurrentGame.picked[value] then
+				bitCard = bit.bor( bitCard, bit.lshift( 1, place-1 ) )
+			end
+			-- print( place-1, value, bitCard )
+		end
+
+		for _, winMask in ipairs( Bingo.WIN_MASKS ) do
+			-- print( "Does "..bit.band( bitCard, winMask ).." = "..winMask.."?" )
+			if bit.band( bitCard, winMask ) == winMask then
+				Bingo.QueueMessage( player.." has won the game!" )
+				Bingo_CurrentGame.winner = player
+				Bingo_CurrentGame.endedAt = time()
+				Bingo_CurrentGame.stopped = true
+				return true
+			end
+		end
+	end
+end
 function Bingo.RegisterEvents()
 	if Bingo_CurrentGame.channel == "guild" then
 		BingoFrame:RegisterEvent( "CHAT_MSG_GUILD" )
@@ -364,6 +433,7 @@ function Bingo.CHAT_MSG_( self, msg, sender )
 		if strmatch( msg, "^[!]?bingo[!]?$") then
 			if strmatch( msg, "^!" ) or strmatch( msg, "!$" ) then
 				Bingo.SendMessage( sender.." has called BINGO!", Bingo_CurrentGame.channel )
+				Bingo.CheckForWinningCard( sender )
 			end
 		end
 	end
