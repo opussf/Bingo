@@ -9,7 +9,7 @@ Bingo.COLOR = {
 }
 
 Bingo.cardLimit = 10  -- make this a configure option soonish
-Bingo.ballDelaySeconds = 6
+Bingo.ballDelaySeconds = 7
 Bingo.gameEndDelaySeconds = 30
 
 -- Init saved variables
@@ -27,8 +27,8 @@ Bingo.startMessages = {
 	"Lets play BINGO!",
 	"If you don't have cards, please whisper me for cards with >!cards #<",
 	"If you have cards, you can play with those cards by doing nothing.",
-	"Whisper !help to me for more commands.",
-	"BINGO will start in 1 minute.",
+	"Whisper !help to me for more commands. The game will start in 1 minute.",
+	"Say BINGO! in this channel when you get a BINGO!"
 }
 Bingo.helpMessages = {
 	"Whisper these commands directly to me, with the line starting with ! (and no space)",
@@ -170,7 +170,7 @@ function Bingo.CallBall()
 		local colLetter = Bingo.letters[ math.floor( (ball-1)/15 ) ]
 		Bingo_CurrentGame.picked[ ball ] = true
 		Bingo_CurrentGame.lastBallAt = time()
-		Bingo.QueueMessage( colLetter..ball, Bingo_CurrentGame.channel )
+		Bingo.QueueMessage( colLetter.."-"..ball, Bingo_CurrentGame.channel )
 	end
 end
 -------------
@@ -360,7 +360,13 @@ end
 function Bingo.CHAT_MSG_( self, msg, sender )
 	msg = string.lower( msg )
 	Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
-
+	if Bingo_CurrentGame.startedAt and Bingo_CurrentGame.startedAt < time() then
+		if strmatch( msg, "^[!]?bingo[!]?$") then
+			if strmatch( msg, "^!" ) or strmatch( msg, "!$" ) then
+				Bingo.SendMessage( sender.." has called BINGO!", Bingo_CurrentGame.channel )
+			end
+		end
+	end
 end
 Bingo.CHAT_MSG_SAY = Bingo.CHAT_MSG_
 Bingo.CHAT_MSG_GUILD = Bingo.CHAT_MSG_
