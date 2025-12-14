@@ -169,7 +169,6 @@ test.run()
 --[[
 
 
-
 Bingo_CurrentGame.picked = {
 	["B1"] = true
 
