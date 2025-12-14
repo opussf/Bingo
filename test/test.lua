@@ -170,7 +170,6 @@ end
 function test.test_bangCommands_return_all_tenCards()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
 	Bingo.CHAT_MSG_WHISPER( {}, "!return all", "Otherplayer-Other Realm" )
-	test.dump(Bingo.messageQueue)
 	assertEquals( "All of your cards have been returned.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[61] )
 	assertIsNil( Bingo_PlayerCards["Otherplayer-Other Realm"], "Player should not be listed if they have no cards left." )
 end

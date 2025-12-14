@@ -9,6 +9,7 @@ Bingo.COLOR = {
 }
 
 Bingo.cardLimit = 10  -- make this a configure option soonish
+Bingo.ballDelaySeconds = 6
 
 -- Init saved variables
 Bingo_PlayerCards = {}  -- { ["player"] = {["hash"] = {{2d array of card}} } }
@@ -33,15 +34,8 @@ Bingo.helpMessages = {
 	"! cards # - generate and play with at least # cards.",
 	"! cards 0 - will return all of your cards.",
 	"! list - list the card hashes",
-	"! show <hash> - shows cards that match the hash. no list shows all cards",
-	"! return <comma seperated list of hashes> - Hash has to match only 1 card to be returned."
-}
-Bingo.playerStates = {
-	[1] = function(player)
-			SendChatMessage("Please ask for cards by whispering me with >!cards #<", player)
-			Bingo_CurrentGame.players[player]=2
-		end,
-	[2] = nil,
+	"! show <hash> - shows card that match the hash.",
+	"! return <hash> - return card that matches the hash."
 }
 function Bingo.Print( msg, showName )
 	-- print to the chat frame
@@ -124,21 +118,32 @@ function Bingo.OnUpdate( elapsed )
 			Bingo.messageQueue[target] = nil
 		end
 	end
-	-- if Bingo_CurrentGame and Bingo_CurrentGame.initAt and not Bingo_CurrentGame.endedAt then
-	-- 	Bingo.Print("Game exists, and not ended")
-	-- 	if Bingo_CurrentGame.players then
-	-- 		Bingo.Print("player table exists")
-	-- 		for player, state in pairs( Bingo_CurrentGame.players ) do
-	-- 			Bingo.Print(player.." is at state "..state)
-	-- 			if Bingo.playerStates[state] then
-	-- 				Bingo.Print(state.." exists, calling the function.")
-	-- 				Bingo.playerStates[state](player)
-	-- 			end
-	-- 		end
-	-- 	end
-	-- end
+	-- handle game loop
+	if not Bingo_CurrentGame then  -- there should always be a currentGame table
+		Bingo_CurrentGame = {}
+	end
+	-- start a game that has been initalized
+	if not Bingo_CurrentGame.startedAt and Bingo_CurrentGame.initAt and Bingo_CurrentGame.initAt+60 < time() then
+		Bingo_CurrentGame.startedAt = time()
+		Bingo_CurrentGame.lastBallAt = Bingo_CurrentGame.initAt -- set this in the past
+	end
+	if Bingo_CurrentGame.startedAt and not Bingo_CurrentGame.endedAt then
+		if Bingo_CurrentGame.lastBallAt and Bingo_CurrentGame.lastBallAt + Bingo.ballDelaySeconds <= time() then
+			Bingo.CallBall()
+			if #Bingo_CurrentGame.ball == 0 then
+				Bingo_CurrentGame.endedAt = time() + 15
+				Bingo.QueueMessage( "That was the last ball. You have 15 seconds till end of game." )
+			end
+		end
+	end
+	if not Bingo_CurrentGame.stopped and Bingo_CurrentGame.endedAt and Bingo_CurrentGame.endedAt < time() then
+		Bingo.QueueMessage( "The game has ended." )
+		Bingo_CurrentGame.stopped = true
+		Bingo.UnregisterEvents()
+	end
 end
 function Bingo.StartGame( chatToUse )
+	-- validate chatToUse
 	if Bingo_CurrentGame.initAt == nil or Bingo_CurrentGame.endedAt then
 		Bingo_CurrentGame = {}
 		Bingo_CurrentGame.channel = chatToUse
@@ -158,6 +163,16 @@ function Bingo.StartGame( chatToUse )
 		Bingo.Print( "A game is already in progress." )
 	end
 end
+function Bingo.CallBall()
+	if #Bingo_CurrentGame.ball > 0 then
+		local ball = table.remove( Bingo_CurrentGame.ball, random( 1, #Bingo_CurrentGame.ball ) )
+		local colLetter = Bingo.letters[ math.floor( (ball-1)/15 ) ]
+		Bingo_CurrentGame.picked[ ball ] = true
+		Bingo_CurrentGame.lastBallAt = time()
+		Bingo.QueueMessage( colLetter..ball, Bingo_CurrentGame.channel )
+	end
+end
+-------------
 function Bingo.CardStrToArray( cardStr )
 	-- convert the CardStr to a table
 	local t = {}
@@ -309,6 +324,8 @@ end
 function Bingo.RegisterEvents()
 	if Bingo_CurrentGame.channel == "guild" then
 		BingoFrame:RegisterEvent( "CHAT_MSG_GUILD" )
+	elseif Bingo_CurrentGame.channel == "say" then
+		BingoFrame:RegisterEvent( "CHAT_MSG_SAY" )
 	elseif Bingo_CurrentGame.channel == "raid" then
 		BingoFrame:RegisterEvent( "CHAT_MSG_PARTY" )
 		BingoFrame:RegisterEvent( "CHAT_MSG_PARTY_LEADER" )
@@ -321,18 +338,30 @@ function Bingo.RegisterEvents()
 	end
 	BingoFrame:RegisterEvent( "CHAT_MSG_WHISPER" )
 end
+function Bingo.UnregisterEvents()
+	BingoFrame:UnregisterEvent( "CHAT_MSG_GUILD" )
+	BingoFrame:UnregisterEvent( "CHAT_MSG_SAY" )
+	BingoFrame:UnregisterEvent( "CHAT_MSG_PARTY" )
+	BingoFrame:UnregisterEvent( "CHAT_MSG_PARTY_LEADER" )
+	BingoFrame:UnregisterEvent( "CHAT_MSG_RAID" )
+	BingoFrame:UnregisterEvent( "CHAT_MSG_RAID_LEADER" )
+	BingoFrame:UnregisterEvent( "CHAT_MSG_RAID_WARNING" )
+	BingoFrame:UnregisterEvent( "CHAT_MSG_PARTY" )
+	BingoFrame:UnregisterEvent( "CHAT_MSG_PARTY_LEADER" )
+end
 function Bingo.CHAT_MSG_WHISPER( self, msg, sender )
-	Bingo.Print( "CHAT_MSG_WHISPER( "..msg..", "..sender.." )" )
+	-- Bingo.Print( "CHAT_MSG_WHISPER( "..msg..", "..sender.." )" )
 	local cmd, param = Bingo.ParseCmd( msg )
-	Bingo.Print( cmd, param )
 	if Bingo.bangCommands[cmd] then
 		Bingo.bangCommands[cmd](sender, param)
 	end
 end
 function Bingo.CHAT_MSG_( self, msg, sender )
+	msg = string.lower( msg )
 	Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
 
 end
+Bingo.CHAT_MSG_SAY = Bingo.CHAT_MSG_
 Bingo.CHAT_MSG_GUILD = Bingo.CHAT_MSG_
 Bingo.Chat_MSG_PARTY = Bingo.CHAT_MSG_
 Bingo.Chat_MSG_PARTY_LEADER = Bingo.CHAT_MSG_
@@ -399,9 +428,9 @@ Bingo.commandList = {
 		["func"] = function() Bingo.StartGame("party") end,
 		["help"] = {"", "Start game in party chat"},
 	},
-	["general"] = {
-		["func"] = function() Bingo.StartGame("general") end,
-		["help"] = {"", "Start game in general chat"},
+	["say"] = {
+		["func"] = function() Bingo.StartGame("say") end,
+		["help"] = {"", "Start game in say chat"},
 	},
 	["reset"] = {
 		["func"] = Bingo.ResetGame,
