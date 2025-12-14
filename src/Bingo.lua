@@ -33,7 +33,7 @@ Bingo.helpMessages = {
 	"! cards # - generate and play with at least # cards.",
 	"! cards 0 - will return all of your cards.",
 	"! list - list the card hashes",
-	"! show <comma seperated list of hashes> - shows cards that start with the hash. no list shows all cards",
+	"! show <hash> - shows cards that match the hash. no list shows all cards",
 	"! return <comma seperated list of hashes> - Hash has to match only 1 card to be returned."
 }
 Bingo.playerStates = {
@@ -258,7 +258,7 @@ function Bingo.ListCards( player )  -- !list
 	end
 end
 function Bingo.ShowCard( player, hash )  -- !show
-	Bingo.Print( "ShowCard( "..player..", "..hash.." )" )
+	Bingo.Print( "ShowCard( "..player..", "..(hash or nil).." )" )
 	local cardQueue = {}
 	if Bingo_PlayerCards[player] then
 		local cardStr = Bingo_PlayerCards[player][hash]
@@ -275,7 +275,11 @@ function Bingo.ShowCard( player, hash )  -- !show
 				))
 			end
 			Bingo.QueueMessage( cardQueue, player )
+		else
+			Bingo.QueueMessage( hash.." is not one of your cards.", player )
 		end
+	else
+		Bingo.QueueMessage( "You have no cards.", player )
 	end
 end
 function Bingo.RegisterEvents()
@@ -387,6 +391,7 @@ Bingo.bangCommands = {
 	["!cards"] = Bingo.AssignCards,
 	["!card"] = Bingo.AssignCards,
 	["!list"] = Bingo.ListCards,
+	["!show"] = Bingo.ShowCard,
 
 
 
