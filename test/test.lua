@@ -80,17 +80,17 @@ function test.test_bangCommands_help_queue_has_6()
 end
 function test.test_bangCommands_cards_one()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
-	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"], "Should be true." )
 	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
 	assertEquals( 8, string.len(hash) )
-	assertTrue( type(card) == "table" )
+	assertTrue( type(card) == "string" )
 end
 function test.test_bangCommands_cards_ten()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
 	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"] )
 	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
 	assertEquals( 8, string.len(hash) )
-	assertTrue( type(card) == "table" )
+	assertTrue( type(card) == "string" )
 end
 
 
