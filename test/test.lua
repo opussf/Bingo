@@ -99,6 +99,11 @@ function test.test_bangCommands_cards_overMax()
 	assertEquals( 8, string.len(hash) )
 	assertTrue( type(card) == "string" )
 end
+function test.test_bangCommands_cards_zeroReturnsAllCards()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 0", "Otherplayer-Other Realm" )
+	assertIsNil( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+end
 function test.test_bangCommand_list_noCards()
 	Bingo.CHAT_MSG_WHISPER( {}, "!list", "Otherplayer-Other Realm" )
 	assertEquals( "You have no cards to list.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[1] )

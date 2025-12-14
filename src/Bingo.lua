@@ -228,19 +228,24 @@ end
 function Bingo.AssignCards( player, minNumber )  -- !cards
 	Bingo.Print( "AssignCards( "..player..", "..(minNumber or "nil").." )" )
 	if minNumber then
-		minNumber = math.min( tonumber(minNumber), Bingo.cardLimit )
-		-- count the number of cards that the player has
-		local cardCount = 0
-		for hash, _ in pairs( Bingo_PlayerCards[player] or {} ) do
-			cardCount = cardCount + 1
-			Bingo.Print( cardCount.." -> "..hash )
-		end
-		Bingo_PlayerCards[player] = Bingo_PlayerCards[player] or {}
-		for cardNum = cardCount+1, minNumber do
-			-- Bingo.Print( "Make card "..cardNum )
-			local hash, newCard = Bingo.MakeCard()
-			Bingo_PlayerCards[player][hash] = newCard
-			Bingo.ShowCard( player, hash )
+		minNumber = tonumber(minNumber)
+		if minNumber > 0 then
+			minNumber = math.min( minNumber, Bingo.cardLimit )
+			-- count the number of cards that the player has
+			local cardCount = 0
+			for hash, _ in pairs( Bingo_PlayerCards[player] or {} ) do
+				cardCount = cardCount + 1
+				Bingo.Print( cardCount.." -> "..hash )
+			end
+			Bingo_PlayerCards[player] = Bingo_PlayerCards[player] or {}
+			for cardNum = cardCount+1, minNumber do
+				-- Bingo.Print( "Make card "..cardNum )
+				local hash, newCard = Bingo.MakeCard()
+				Bingo_PlayerCards[player][hash] = newCard
+				Bingo.ShowCard( player, hash )
+			end
+		else -- minNumber = 0
+			Bingo.ReturnCard( player, "all" )
 		end
 	else
 		Bingo.ListCards( player )
