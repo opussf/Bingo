@@ -285,14 +285,17 @@ end
 function Bingo.ReturnCard( player, hash )  -- !return
 	Bingo.Print( "ReturnCard( "..player..", "..(hash or "nil").." )" )
 	if Bingo_PlayerCards[player] then
-		if Bingo_PlayerCards[player][hash] then
+		if hash == "all" then
+			Bingo_PlayerCards[player] = nil
+			Bingo.QueueMessage( "All of your cards have been returned.", player )
+		elseif Bingo_PlayerCards[player][hash] then
 			Bingo_PlayerCards[player][hash] = nil
 			Bingo.QueueMessage( hash.." has been returned.", player )
+			if not next(Bingo_PlayerCards[player]) then
+				Bingo_PlayerCards[player] = nil
+			end
 		else
 			Bingo.QueueMessage( hash.." is not one of your cards.", player )
-		end
-		if not next(Bingo_PlayerCards[player]) then
-			Bingo_PlayerCards[player] = nil
 		end
 	else
 		Bingo.QueueMessage( "You have no cards to return.", player )
