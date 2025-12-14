@@ -88,14 +88,14 @@ end
 function test.test_bangCommands_cards_ten()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
 	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"] )
-	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	local hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
 	assertEquals( 8, string.len(hash) )
 	assertTrue( type(card) == "string" )
 end
 function test.test_bangCommands_cards_overMax()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 100", "Otherplayer-Other Realm" )
 	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"] )
-	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	local hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
 	assertEquals( 8, string.len(hash) )
 	assertTrue( type(card) == "string" )
 end
@@ -106,13 +106,13 @@ end
 function test.test_bangCommand_list_oneCard()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
 	Bingo.CHAT_MSG_WHISPER( {}, "!list", "Otherplayer-Other Realm" )
-	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	local hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
 	assertEquals( hash, Bingo.messageQueue["Otherplayer-Other Realm"].queue[7] )
 end
 function test.test_bangCommand_list_tenCards()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
 	Bingo.CHAT_MSG_WHISPER( {}, "!list", "Otherplayer-Other Realm" )
-	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	local hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
 	assertEquals( 70, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
 end
 function test.test_bangCommand_show_noCards()
@@ -121,27 +121,47 @@ function test.test_bangCommand_show_noCards()
 end
 function test.test_bangCommand_show_oneCard()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
-	hash = next( Bingo_PlayerCards["Otherplayer-Other Realm"])
+	local hash = next( Bingo_PlayerCards["Otherplayer-Other Realm"])
 	Bingo.CHAT_MSG_WHISPER( {}, "!show "..hash, "Otherplayer-Other Realm" )
 	-- 7th entry means that it was shown twice.
 	assertEquals( " B  I  N  G  O  - "..hash, Bingo.messageQueue["Otherplayer-Other Realm"].queue[7] )
 end
 function test.test_bangCommand_show_oneCard_badHash()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
-	hash = next( Bingo_PlayerCards["Otherplayer-Other Realm"])
+	local hash = next( Bingo_PlayerCards["Otherplayer-Other Realm"])
 	Bingo.CHAT_MSG_WHISPER( {}, "!show e40d7f00", "Otherplayer-Other Realm" )
 	assertEquals( "e40d7f00 is not one of your cards.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[7] )
 end
 function test.test_bangCommand_show_tenCards()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
-	hash = next( Bingo_PlayerCards["Otherplayer-Other Realm"])
+	local hash = next( Bingo_PlayerCards["Otherplayer-Other Realm"])
 	Bingo.CHAT_MSG_WHISPER( {}, "!show "..hash, "Otherplayer-Other Realm" )
-	test.dump(chatLog)
-	test.dump(Bingo.messageQueue)
 	-- 61st entry
 	assertEquals( " B  I  N  G  O  - "..hash, Bingo.messageQueue["Otherplayer-Other Realm"].queue[61] )
 end
-
+function test.test_bangCommands_return_noCards()
+	Bingo.CHAT_MSG_WHISPER( {}, "!return e40d7f00", "Otherplayer-Other Realm" )
+	assertEquals( "You have no cards to return.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[1] )
+end
+function test.test_bangCommands_return_oneCard()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
+	local hash = next( Bingo_PlayerCards["Otherplayer-Other Realm"])
+	Bingo.CHAT_MSG_WHISPER( {}, "!return "..hash, "Otherplayer-Other Realm" )
+	assertEquals( hash.." has been returned.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[7] )
+	assertIsNil( Bingo_PlayerCards["Otherplayer-Other Realm"], "Player should not be listed if they have no cards left." )
+end
+function test.test_bangCommands_return_oneCard_badHash()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
+	Bingo.CHAT_MSG_WHISPER( {}, "!return e40d7f00", "Otherplayer-Other Realm" )
+	assertEquals( "e40d7f00 is not one of your cards.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[7] )
+end
+function test.test_bangCommands_return_tenCards()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
+	local hash = next( Bingo_PlayerCards["Otherplayer-Other Realm"])
+	Bingo.CHAT_MSG_WHISPER( {}, "!return "..hash, "Otherplayer-Other Realm" )
+	assertEquals( hash.." has been returned.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[61] )
+	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"], "Player should still be listed." )
+end
 
 test.run()
 
