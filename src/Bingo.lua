@@ -8,16 +8,18 @@ Bingo.COLOR = {
 	END = "|r",
 }
 
+Bingo.cardLimit = 10  -- make this a configure option soonish
+
 -- Init saved variables
 Bingo_PlayerCards = {}  -- { ["player"] = {["hash"] = {{2d array of card}} } }
 Bingo_CurrentGame = {}
 Bingo.messageQueue = {}
 Bingo.letters = {
-	[0] = "B",
-	[1] = "I",
-	[2] = "N",
-	[3] = "G",
-	[4] = "O",
+	[0] = "B",   --  1-15
+	[1] = "I",   -- 16-30
+	[2] = "N",   -- 31-45
+	[3] = "G",   -- 46-60
+	[4] = "O",   -- 61-75
 }
 Bingo.startMessages = {
 	"Lets play BINGO!",
@@ -27,12 +29,12 @@ Bingo.startMessages = {
 	"BINGO will start in 1 minute.",
 }
 Bingo.helpMessages = {
-	"Whisper these commands directly to me.",
-	"!cards # - generate and play with at least # cards.",
-	"!cards 0 - will return all of your cards.",
-	"!list - list the card hashes",
-	"!show <comma seperated list of hashes> - shows cards that start with the hash. no list shows all cards",
-	"!return <comma seperated list of hashes> - Hash has to match only 1 card to be returned."
+	"Whisper these commands directly to me, with the line starting with ! (and no space)",
+	"! cards # - generate and play with at least # cards.",
+	"! cards 0 - will return all of your cards.",
+	"! list - list the card hashes",
+	"! show <comma seperated list of hashes> - shows cards that start with the hash. no list shows all cards",
+	"! return <comma seperated list of hashes> - Hash has to match only 1 card to be returned."
 }
 Bingo.playerStates = {
 	[1] = function(player)
@@ -54,7 +56,7 @@ function Bingo.QueueMessage( msg, target )
 	if not target or target == "" then
 		target = Bingo_CurrentGame.channel or "pick a default"
 	end
-	Bingo.messageQueue[target] = Bingo.messageQueue[target] or { queue = {}, last = time() }
+	Bingo.messageQueue[target] = Bingo.messageQueue[target] or { queue = {}, last = time()-1 }
 
 	if type( msg ) == "string" then
 		table.insert( Bingo.messageQueue[target].queue, msg )
@@ -66,6 +68,9 @@ function Bingo.QueueMessage( msg, target )
 end
 function Bingo.SendMessage( msg, target )
 	-- guild, raid, party, general
+	if not target or target == "" then
+		target = Bingo_CurrentGame.channel or "pick a default"
+	end
 	local chatChannel, toWhom
 	if target then
 		if target == "guild" and IsInGuild() then
@@ -86,7 +91,18 @@ function Bingo.SendMessage( msg, target )
 		end
 	end
 end
-
+function Bingo.spairs( t )
+	local keys={}
+	for k in pairs(t) do keys[#keys+1] = k end
+	table.sort( keys )
+	local i = 0
+	return function()
+		i = i + 1
+		if keys[i] then
+			return keys[i], t[keys[i]]
+		end
+	end
+end
 function Bingo.OnLoad()
 	SLASH_BINGO1 = "/BINGO"
 	SlashCmdList["BINGO"] = Bingo.Command
@@ -94,6 +110,7 @@ function Bingo.OnLoad()
 end
 function Bingo.PLAYER_ENTERING_WORLD()
 	Bingo.RegisterEvents()
+	-- math.randomseed(time())
 end
 function Bingo.OnUpdate( elapsed )
 	-- handle message Queue
@@ -141,22 +158,138 @@ function Bingo.StartGame( chatToUse )
 		Bingo.Print( "A game is already in progress." )
 	end
 end
-function Bingo.AssignCards( player, number )
-	Bingo.Print( "AssignCards( "..player..", "..(number or nil).." )" )
+function Bingo.CardStrToArray( cardStr )
+	-- convert the CardStr to a table
+	local t = {}
+	for val in string.gmatch( cardStr, "([^,]+)") do
+		table.insert( t, val )
+	end
+	return t
+end
+function Bingo.FNV1a(str)
+    local hash = 2166136261
+    for i = 1, #str do
+        hash = bit.bxor(hash, str:byte(i))
+        hash = (hash * 16777619) % 2^32
+    end
+    return string.format("%08x", hash)
+end
+function Bingo.MakeCard()
+	-- returns hash, and 2d array x,y
+	-- also searches PlayerCards to assure unique card.
+	-- 552,446,474,061,128,648,601,600,000 unique cards.
+	-- 5.52 x 10^26
 
+	local usedHashes = {}
+	for _, cards in pairs( Bingo_PlayerCards ) do
+		for hash in pairs( cards ) do
+			usedHashes[hash] = true
+		end
+	end
+
+	local buildCard = true
+	local hash, card, cardString
+	while buildCard do
+		local values = {}
+		for val = 1,75 do
+			table.insert(values, val)
+		end
+		card = {{},{},{},{},{}} -- empty card
+
+		local finished = 0
+		while finished < 31 do
+			-- get a random value
+			local val = table.remove( values, random(1,#values) )
+			local col = math.floor((val-1)/15)
+
+			if #card[col+1] < 5 then
+				-- Bingo.Print(val.."->"..col.."("..Bingo.letters[col]..")")
+				table.insert( card[col+1], val )
+				if #card[col+1] == 5 then
+					finished = finished + 2^col
+				end
+			end
+			-- Bingo.Print( Bingo.letters[col].." "..table.concat(card[col+1], ",").." "..finished )
+		end
+		-- set the free spot
+		card[3][3] = 0
+		cardString = string.format("%s,%s,%s,%s,%s",
+			table.concat(card[1],","),
+			table.concat(card[2],","),
+			table.concat(card[3],","),
+			table.concat(card[4],","),
+			table.concat(card[5],",")
+		)
+		hash = Bingo.FNV1a( cardString )
+		buildCard = usedHashes[hash] -- set to nil (falsey) if not used already
+	end
+	return hash, cardString
+end
+function Bingo.AssignCards( player, minNumber )  -- !cards
+	Bingo.Print( "AssignCards( "..player..", "..(minNumber or nil).." )" )
+	if minNumber then
+		minNumber = math.min( tonumber(minNumber), Bingo.cardLimit )
+		-- count the number of cards that the player has
+		local cardCount = 0
+		for hash, _ in pairs( Bingo_PlayerCards[player] or {} ) do
+			cardCount = cardCount + 1
+			Bingo.Print( cardCount.." -> "..hash )
+		end
+		Bingo_PlayerCards[player] = Bingo_PlayerCards[player] or {}
+		for cardNum = cardCount+1, minNumber do
+			-- Bingo.Print( "Make card "..cardNum )
+			local hash, newCard = Bingo.MakeCard()
+			Bingo_PlayerCards[player][hash] = newCard
+			Bingo.ShowCard( player, hash )
+		end
+	else
+		Bingo.ListCards( player )
+	end
+end
+function Bingo.ListCards( player )  -- !list
+	Bingo.Print( "ListCards( "..player.." )" )
+	-- list card hashes
+	if Bingo_PlayerCards[player] then
+		for hash, _ in Bingo.spairs( Bingo_PlayerCards[player] ) do
+			Bingo.QueueMessage( hash, player )
+		end
+	else
+		Bingo.QueueMessage( "You have no cards to list.", player )
+	end
+end
+function Bingo.ShowCard( player, hash )  -- !show
+	Bingo.Print( "ShowCard( "..player..", "..hash.." )" )
+	local cardQueue = {}
+	if Bingo_PlayerCards[player] then
+		local cardStr = Bingo_PlayerCards[player][hash]
+		if cardStr then
+			local cardArray = Bingo.CardStrToArray( cardStr )
+			table.insert( cardQueue, " B  I  N  G  O  - "..hash )
+			for row = 1,5 do
+				table.insert( cardQueue, string.format( "%2d %2d %2d %2d %2d",
+						cardArray[row],
+						cardArray[5+row],
+						cardArray[10+row],
+						cardArray[15+row],
+						cardArray[20+row]
+				))
+			end
+			Bingo.QueueMessage( cardQueue, player )
+		end
+	end
 end
 function Bingo.RegisterEvents()
 	if Bingo_CurrentGame.channel == "guild" then
 		BingoFrame:RegisterEvent( "CHAT_MSG_GUILD" )
 	elseif Bingo_CurrentGame.channel == "raid" then
-		BingoFrame:UnregisterEvent( "CHAT_MSG_PARTY" )
-		BingoFrame:UnregisterEvent( "CHAT_MSG_PARTY_LEADER" )
-		BingoFrame:UnregisterEvent( "CHAT_MSG_RAID" )
-		BingoFrame:UnregisterEvent( "CHAT_MSG_RAID_LEADER" )
-		BingoFrame:UnregisterEvent( "CHAT_MSG_RAID_WARNING" )
+		BingoFrame:RegisterEvent( "CHAT_MSG_PARTY" )
+		BingoFrame:RegisterEvent( "CHAT_MSG_PARTY_LEADER" )
+		BingoFrame:RegisterEvent( "CHAT_MSG_RAID" )
+		BingoFrame:RegisterEvent( "CHAT_MSG_RAID_LEADER" )
+		BingoFrame:RegisterEvent( "CHAT_MSG_RAID_WARNING" )
 	elseif Bingo_CurrentGame.channel == "party" then
-		BingoFrame:UnregisterEvent( "CHAT_MSG_PARTY" )
-		BingoFrame:UnregisterEvent( "CHAT_MSG_PARTY_LEADER" )
+		BingoFrame:RegisterEvent( "CHAT_MSG_PARTY" )
+		BingoFrame:RegisterEvent( "CHAT_MSG_PARTY_LEADER" )
 	end
 	BingoFrame:RegisterEvent( "CHAT_MSG_WHISPER" )
 end
@@ -170,11 +303,6 @@ function Bingo.CHAT_MSG_WHISPER( self, msg, sender )
 end
 function Bingo.CHAT_MSG_( self, msg, sender )
 	Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
-	if string.find( msg, "!join" ) then
-		if not Bingo_CurrentGame.players[sender] then
-			Bingo_CurrentGame.players[sender] = 1
-		end
-	end
 
 end
 Bingo.CHAT_MSG_GUILD = Bingo.CHAT_MSG_
@@ -258,6 +386,8 @@ Bingo.bangCommands = {
 		end,
 	["!cards"] = Bingo.AssignCards,
 	["!card"] = Bingo.AssignCards,
+	["!list"] = Bingo.ListCards,
+
 
 
 	-- ["!cards"] = functionkjsdhfkj

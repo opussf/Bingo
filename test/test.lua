@@ -8,11 +8,12 @@ test.coverageReportPercent = true
 ParseTOC( "../src/Bingo.toc" )
 
 function test.before()
-    chatLog = {}
-    Bingo_PlayerCards = {}
+	chatLog = {}
+	Bingo_PlayerCards = {}
 	Bingo_CurrentGame = {}
-    Bingo.OnLoad()
-    Bingo.PLAYER_ENTERING_WORLD()
+	Bingo.messageQueue = {}
+	Bingo.OnLoad()
+	Bingo.PLAYER_ENTERING_WORLD()
 end
 function test.after()
 end
@@ -42,12 +43,74 @@ function test.test_start_GameStillRunning()
 	Bingo.Command("guild")
 	assertEquals( "party", Bingo_CurrentGame.channel )
 end
--- function test.test_SendMessage_sent_str()
--- 	Bingo_CurrentGame.channel = "party"
--- 	-- SendMessages uses the choosen game channel
--- 	Bingo.SendMessage( "Hello there" )
--- 	assertEquals( "Hello there", chatLog[1].msg )
--- end
+function test.test_SendMessage_sent_str()
+	Bingo_CurrentGame.channel = "say"
+	-- SendMessages uses the choosen game channel
+	Bingo.SendMessage( "Hello there" )
+	assertEquals( "Hello there", chatLog[1].msg )
+	assertEquals( "SAY", chatLog[1].chatType )
+end
+function test.test_queueMessage_goesIntoQueue()
+	Bingo.QueueMessage( "Plushie", "say" )
+	assertEquals( "Plushie", Bingo.messageQueue["say"].queue[1] )
+	assertAlmostEquals( time()-1, Bingo.messageQueue["say"].last )
+end
+function test.test_queueMessage_isPosted()
+	Bingo.messageQueue["say"] = { queue = {"kindle"}, last = time()-5 }
+	Bingo.OnUpdate()
+	assertEquals( "kindle", chatLog[1].msg )
+end
+function test.test_queueMessage_isPosted_toSay()
+	Bingo.messageQueue["say"] = { queue = {"kindle"}, last = time()-5 }
+	Bingo.OnUpdate()
+	assertEquals( "SAY", chatLog[1].chatType )
+end
+function test.test_queueMessage_isPosted_isCleared()
+	Bingo.messageQueue["say"] = { queue = {"kindle"}, last = time()-5 }
+	Bingo.OnUpdate()
+	assertIsNil( Bingo.messageQueue["say"] )
+end
+function test.test_bangCommands_help_toPlayer()
+	Bingo.CHAT_MSG_WHISPER( {}, "!help", "Otherplayer-Other Realm" )
+	assertTrue( Bingo.messageQueue["Otherplayer-Other Realm"] )
+end
+function test.test_bangCommands_help_queue_has_6()
+	Bingo.CHAT_MSG_WHISPER( {}, "!help", "Otherplayer-Other Realm" )
+	assertEquals( 6, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
+end
+function test.test_bangCommands_cards_one()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
+	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"], "Should be true." )
+	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	assertEquals( 8, string.len(hash) )
+	assertTrue( type(card) == "string" )
+end
+function test.test_bangCommands_cards_ten()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
+	assertTrue( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	assertEquals( 8, string.len(hash) )
+	assertTrue( type(card) == "string" )
+end
+function test.test_bangCommand_list_noCards()
+	Bingo.CHAT_MSG_WHISPER( {}, "!list", "Otherplayer-Other Realm" )
+	assertEquals( "You have no cards to list.", Bingo.messageQueue["Otherplayer-Other Realm"].queue[1] )
+end
+function test.test_bangCommand_list_oneCard()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
+	Bingo.CHAT_MSG_WHISPER( {}, "!list", "Otherplayer-Other Realm" )
+	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	assertEquals( hash, Bingo.messageQueue["Otherplayer-Other Realm"].queue[7] )
+end
+function test.test_bangCommand_list_tenCards()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 10", "Otherplayer-Other Realm" )
+	Bingo.CHAT_MSG_WHISPER( {}, "!list", "Otherplayer-Other Realm" )
+	test.dump(chatLog)
+	test.dump(Bingo.messageQueue)
+	hash, card = next( Bingo_PlayerCards["Otherplayer-Other Realm"] )
+	assertEquals( 70, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
+end
+
 
 test.run()
 
@@ -107,5 +170,6 @@ function StripDice.GROUP_ROSTER_UPDATE()
 		StripDice.gameActive = true
 	end
 end
+
 
 ]]
