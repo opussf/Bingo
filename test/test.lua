@@ -265,4 +265,5 @@ function test.test_windetect_diag1_withExtras()
 	assertTrue( Bingo_CurrentGame.stopped )
 end
 
+
 test.run()

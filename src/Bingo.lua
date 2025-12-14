@@ -76,6 +76,8 @@ function Bingo.SendMessage( msg, target )
 			chatChannel = "PARTY"
 		elseif target == "say" then
 			chatChannel = "SAY"
+		elseif target == "yell" then
+			chatChannel = "YELL"
 		elseif target ~= "" then
 			chatChannel = "WHISPER"
 			toWhom = target
@@ -268,7 +270,7 @@ function Bingo.AssignCards( player, minNumber )  -- !cards
 	end
 end
 function Bingo.ListCards( player )  -- !list
-	Bingo.Print( "ListCards( "..player.." )" )
+	-- Bingo.Print( "ListCards( "..player.." )" )
 	-- list card hashes
 	if Bingo_PlayerCards[player] then
 		for hash, _ in Bingo.spairs( Bingo_PlayerCards[player] ) do
@@ -279,7 +281,7 @@ function Bingo.ListCards( player )  -- !list
 	end
 end
 function Bingo.ShowCard( player, hash )  -- !show
-	Bingo.Print( "ShowCard( "..player..", "..(hash or "nil").." )" )
+	-- Bingo.Print( "ShowCard( "..player..", "..(hash or "nil").." )" )
 	local cardQueue = {}
 	if Bingo_PlayerCards[player] then
 		local cardStr = Bingo_PlayerCards[player][hash]
@@ -304,7 +306,7 @@ function Bingo.ShowCard( player, hash )  -- !show
 	end
 end
 function Bingo.ReturnCard( player, hash )  -- !return
-	Bingo.Print( "ReturnCard( "..player..", "..(hash or "nil").." )" )
+	-- Bingo.Print( "ReturnCard( "..player..", "..(hash or "nil").." )" )
 	if Bingo_PlayerCards[player] then
 		if hash == "all" then
 			Bingo_PlayerCards[player] = nil
@@ -361,7 +363,7 @@ function Bingo.MakeWinMasks()
 											bit.lshift( 1, 20 ) ) ) ) ) )
 end
 function Bingo.CheckForWinningCard( player )
-	Bingo.Print( "CheckForWinningCard( "..player.." )" )
+	-- Bingo.Print( "CheckForWinningCard( "..player.." )" )
 	if not Bingo.WIN_MASKS then
 		Bingo.MakeWinMasks()
 	end
@@ -390,6 +392,7 @@ function Bingo.CheckForWinningCard( player )
 			end
 		end
 	end
+	Bingo.QueueMessage( player.." does not have bingo!" )
 end
 function Bingo.RegisterEvents()
 	if Bingo_CurrentGame.channel == "guild" then
@@ -433,7 +436,7 @@ function Bingo.CHAT_MSG_WHISPER( self, msg, sender )
 end
 function Bingo.CHAT_MSG_( self, msg, sender )
 	msg = string.lower( msg )
-	Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
+	-- Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
 	if Bingo_CurrentGame.startedAt and Bingo_CurrentGame.startedAt < time() then
 		if strmatch( msg, "^[!]?bingo[!]?$") then
 			if strmatch( msg, "^!" ) or strmatch( msg, "!$" ) then
