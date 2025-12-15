@@ -72,7 +72,7 @@ function Bingo.SendMessage( msg, target )
 			chatChannel = "GUILD"
 		elseif target == "raid" and IsInRaid() then
 			chatChannel = "RAID"
-		elseif target == "party" and InInGroup( LE_PARTY_CATEGORY_HOME ) then
+		elseif target == "party" and IsInGroup( LE_PARTY_CATEGORY_HOME ) then
 			chatChannel = "PARTY"
 		elseif target == "say" then
 			chatChannel = "SAY"
@@ -449,13 +449,14 @@ end
 Bingo.CHAT_MSG_SAY = Bingo.CHAT_MSG_
 Bingo.CHAT_MSG_YELL = Bingo.CHAT_MSG_
 Bingo.CHAT_MSG_GUILD = Bingo.CHAT_MSG_
-Bingo.Chat_MSG_PARTY = Bingo.CHAT_MSG_
-Bingo.Chat_MSG_PARTY_LEADER = Bingo.CHAT_MSG_
-Bingo.Chat_MSG_RAID = Bingo.CHAT_MSG_
-Bingo.Chat_MSG_RAID_LEADER = Bingo.CHAT_MSG_
-Bingo.Chat_MSG_RAID_WARNING = Bingo.CHAT_MSG_
+Bingo.CHAT_MSG_PARTY = Bingo.CHAT_MSG_
+Bingo.CHAT_MSG_PARTY_LEADER = Bingo.CHAT_MSG_
+Bingo.CHAT_MSG_RAID = Bingo.CHAT_MSG_
+Bingo.CHAT_MSG_RAID_LEADER = Bingo.CHAT_MSG_
+Bingo.CHAT_MSG_RAID_WARNING = Bingo.CHAT_MSG_
 function Bingo.ResetGame()
 	Bingo_CurrentGame = {}
+	Bing.UnregisterEvents()
 	Bingo.Print("Game has been reset")
 end
 function Bingo.PrintHelp()
