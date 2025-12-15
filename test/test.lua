@@ -265,6 +265,18 @@ function test.test_windetect_diag1_withExtras()
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
 	assertTrue( Bingo_CurrentGame.stopped )
 end
-
+function test.test_windetect_playerHasNoCard()
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [10] = true, [19] = true, [40] = true, [59] = true, [73] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-NoCard" )
+	assertIsNil( Bingo_CurrentGame.winner )  -- does not mark a winner
+	assertIsNil( Bingo_CurrentGame.endedAt ) -- does not end the game
+	assertIsNil( Bingo_CurrentGame.stopped ) -- does not stop the game
+	assertEquals( "Frank-NoCard does not have a card!", Bingo.messageQueue["say"].queue[6] )
+end
 
 test.run()
