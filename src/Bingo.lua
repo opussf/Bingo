@@ -279,6 +279,7 @@ function Bingo.ListCards( player )  -- !list
 	-- Bingo.Print( "ListCards( "..player.." )" )
 	-- list card hashes
 	if Bingo_PlayerCards[player] then
+		Bingo.QueueMessage( "These are your card ids:", player )
 		for hash, _ in Bingo.spairs( Bingo_PlayerCards[player] ) do
 			Bingo.QueueMessage( hash, player )
 		end
