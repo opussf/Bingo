@@ -234,7 +234,6 @@ function Bingo.MakeCard()
 					finished = finished + 2^col
 				end
 			end
-			-- Bingo.Print( Bingo.letters[col].." "..table.concat(card[col+1], ",").." "..finished )
 		end
 		-- set the free spot
 		card[3][3] = 0
@@ -375,31 +374,35 @@ function Bingo.CheckForWinningCard( player )
 		Bingo.MakeWinMasks()
 	end
 
-	for hash, cardStr in pairs( Bingo_PlayerCards[player] ) do
-		local bitCard = bit.lshift(1, 12)  -- set the free spot
+	if Bingo_PlayerCards[player] then
+		for hash, cardStr in pairs( Bingo_PlayerCards[player] ) do
+			local bitCard = bit.lshift(1, 12)  -- set the free spot
 
-		-- print( hash, cardStr, bitCard )
-		local cardArray = Bingo.CardStrToArray( cardStr )
-		for place, value in ipairs( cardArray ) do
-			value = tonumber( value )
-			if Bingo_CurrentGame.picked[value] then
-				bitCard = bit.bor( bitCard, bit.lshift( 1, place-1 ) )
+			-- print( hash, cardStr, bitCard )
+			local cardArray = Bingo.CardStrToArray( cardStr )
+			for place, value in ipairs( cardArray ) do
+				value = tonumber( value )
+				if Bingo_CurrentGame.picked[value] then
+					bitCard = bit.bor( bitCard, bit.lshift( 1, place-1 ) )
+				end
+				-- print( place-1, value, bitCard )
 			end
-			-- print( place-1, value, bitCard )
-		end
 
-		for _, winMask in ipairs( Bingo.WIN_MASKS ) do
-			-- print( "Does "..bit.band( bitCard, winMask ).." = "..winMask.."?" )
-			if bit.band( bitCard, winMask ) == winMask then
-				Bingo.QueueMessage( player.." has won the game!" )
-				Bingo_CurrentGame.winner = player
-				Bingo_CurrentGame.endedAt = time()
-				Bingo_CurrentGame.stopped = true
-				return true
+			for _, winMask in ipairs( Bingo.WIN_MASKS ) do
+				-- print( "Does "..bit.band( bitCard, winMask ).." = "..winMask.."?" )
+				if bit.band( bitCard, winMask ) == winMask then
+					Bingo.QueueMessage( player.." has won the game!" )
+					Bingo_CurrentGame.winner = player
+					Bingo_CurrentGame.endedAt = time()
+					Bingo_CurrentGame.stopped = true
+					return true
+				end
 			end
 		end
+		Bingo.QueueMessage( player.." does not have bingo!" )
+	else
+		Bingo.QueueMessage( player.." does not have a card!" )
 	end
-	Bingo.QueueMessage( player.." does not have bingo!" )
 end
 function Bingo.RegisterEvents()
 	if Bingo_CurrentGame.channel == "guild" then
