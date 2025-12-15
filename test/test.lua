@@ -74,9 +74,9 @@ function test.test_bangCommands_help_toPlayer()
 	Bingo.CHAT_MSG_WHISPER( {}, "!help", "Otherplayer-Other Realm" )
 	assertTrue( Bingo.messageQueue["Otherplayer-Other Realm"] )
 end
-function test.test_bangCommands_help_queue_has_6()
+function test.test_bangCommands_help_queue_has_7()
 	Bingo.CHAT_MSG_WHISPER( {}, "!help", "Otherplayer-Other Realm" )
-	assertEquals( 6, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
+	assertEquals( 7, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
 end
 function test.test_bangCommands_cards_one()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )

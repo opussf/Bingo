@@ -36,7 +36,14 @@ Bingo.helpMessages = {
 	"! cards 0 - will return all of your cards.",
 	"! list - list the card hashes",
 	"! show <hash> - shows card that match the hash.",
-	"! return <hash> - return card that matches the hash."
+	"! return <hash>|all - return card that matches the hash.",
+	"! tips - to show some helpful tips on playing."
+}
+Bingo.tipMessages = {
+	"Tips for playing:",
+	"Use two 3x5 index cards. one to create a reference card (with numbers),",
+	"and a 2nd index card with dots in a grid. Mark the dots during a game.",
+	"Add the 8 character card ID and your character name to the reference card for later.",
 }
 function Bingo.Print( msg, showName )
 	-- print to the chat frame
@@ -537,4 +544,7 @@ Bingo.bangCommands = {
 	["!list"] = Bingo.ListCards,
 	["!show"] = Bingo.ShowCard,
 	["!return"] = Bingo.ReturnCard,
+	["!tips"] = function( player )
+			Bingo.QueueMessage( Bingo.tipMessages, player )
+		end,
 }
