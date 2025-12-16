@@ -40,6 +40,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+          
+      - name: Install sudo
+        run: |
+            apt-get update && apt-get install -y sudo
 
       # https://github.com/leafo/gh-actions-lua/tags
       - name: Set up Lua
