@@ -36,7 +36,7 @@ Bingo.helpMessages = {
 	"! cards 0 - will return all of your cards.",
 	"! list - list the card hashes",
 	"! show <hash> - shows card that match the hash.",
-	"! return <hash>|all - return card that matches the hash.",
+	"! return <hash>||all - return card that matches the hash.",
 	"! tips - to show some helpful tips on playing."
 }
 Bingo.tipMessages = {

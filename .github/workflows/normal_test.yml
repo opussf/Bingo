@@ -17,6 +17,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    if: github.server_url == 'https://github.com'
     # The type of runner that the job will run on
     runs-on:
       - ubuntu-latest
@@ -40,12 +41,18 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+          
+      - name: Install sudo
+        if: ${{ github.server_url != 'https://github.com' }}
+        run: |
+            apt-get update && apt-get install -y sudo
 
       # https://github.com/leafo/gh-actions-lua/tags
       - name: Set up Lua
         uses: leafo/gh-actions-lua@v12
         with:
           luaVersion: "5.3.5"
+          buildCache: ${{ github.server_url == 'https://github.com' }}  # Add this line to disable caching
 
       # Runs a single command using the runners shell
       - name: Build with ant
