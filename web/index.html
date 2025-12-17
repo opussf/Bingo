@@ -2,72 +2,94 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Bingo Card</title>
+<title>Bingo Cards</title>
 
 <style>
-	body {
-		font-family: sans-serif;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding-top: 30px;
-	}
+  body {
+    font-family: sans-serif;
+    padding: 20px;
+  }
 
-	button {
-		padding: 8px 16px;
-		font-size: 16px;
-		margin-bottom: 20px;
-	}
+  .controls {
+    margin-bottom: 20px;
+  }
 
-	table {
-		border-collapse: collapse;
-	}
+  #cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+  }
 
-	th, td {
-		width: 70px;
-		height: 70px;
-		border: 2px solid black;
-		text-align: center;
-		font-size: 20px;
-	}
+  .card {
+    text-align: center;
+  }
 
-	th {
-		background: #eee;
-		user-select: none;
-	}
+  .card-header {
+    display: flex;
+    justify-content: space-between; /* reset left, card ID right */
+    align-items: center;             /* vertically center items */
+    margin-bottom: 6px;
+  }
 
-	td {
-		cursor: pointer;
-		user-select: none;
-		transition: background-color 0.2s ease;
-	}
+  .card-id {
+    font-size: 13px;
+    opacity: 0.75;
+    font-weight: bold;
+    user-select: text;
+  }
 
-	.punched {
-		background: #4caf50;
-		color: white;
-		font-weight: bold;
-	}
+  button {
+    padding: 6px 12px;
+    font-size: 14px;
+    margin: 4px;
+  }
 
-	.free {
-		background: gold;
-		font-weight: bold;
-		cursor: default;
-	}
+  table {
+    border-collapse: collapse;
+    margin: 0 auto;
+  }
+
+  th, td {
+    width: 55px;
+    height: 55px;
+    border: 2px solid black;
+    text-align: center;
+    font-size: 18px;
+  }
+
+  th {
+    background: #eee;
+    user-select: none;
+  }
+
+  td {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .punched {
+    background: #4caf50;
+    color: white;
+    font-weight: bold;
+  }
+
+  .free {
+    background: gold;
+    font-weight: bold;
+    cursor: default;
+  }
+
 </style>
 </head>
 
 <body>
 
-<button id="reset">Reset Card</button>
+<div class="controls">
+  <button id="global-reset">Reset All Cards</button>
+</div>
 
-<table id="bingo">
-	<thead>
-		<tr>
-			<th>B</th><th>I</th><th>N</th><th>G</th><th>O</th>
-		</tr>
-	</thead>
-	<tbody></tbody>
-</table>
+<div id="cards"></div>
 
 <script src="bingo.js"></script>
 </body>
