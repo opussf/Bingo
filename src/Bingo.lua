@@ -448,9 +448,9 @@ end
 function Bingo.CHAT_MSG_( self, msg, sender )
 	msg = string.lower( msg )
 	-- Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
-	if 	Bingo_CurrentGame.startedAt and
-		Bingo_CurrentGame.startedAt < time() and
-		not Bingo_CurrentGame.endedAt then
+	if Bingo_CurrentGame.startedAt
+		and Bingo_CurrentGame.startedAt < time()
+		and not Bingo_CurrentGame.endedAt then
 		if strmatch( msg, "^[!]?bingo[!]?$") then
 			if strmatch( msg, "^!" ) or strmatch( msg, "!$" ) then
 				Bingo.SendMessage( sender.." has called BINGO!", Bingo_CurrentGame.channel )

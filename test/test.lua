@@ -278,5 +278,22 @@ function test.test_windetect_playerHasNoCard()
 	assertIsNil( Bingo_CurrentGame.stopped ) -- does not stop the game
 	assertEquals( "Frank-NoCard does not have a card!", Bingo.messageQueue["say"].queue[6] )
 end
+---------- Bugs
+function test.test_b19_second_player_calling_bingo_should_not_also_win()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	Bingo_PlayerCards["Mark-Win"] = {["01234567"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [1] = true, [14] = true, [19] = true, [57] = true, [66] = true, }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Mark-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner ) -- Mark is not seen as winner now.
+end
 
 test.run()
