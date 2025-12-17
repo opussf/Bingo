@@ -127,7 +127,7 @@
 				<include name="Readme.txt"/>
 			</fileset>
 		</copy>
-		<chmod perm="ugo+x" dir="${addon.dir}" includes="INEED_Export.lua" />
+		<chmod perm="ugo+x" dir="${addon.dir}" includes="${ant.project.name}_Export.lua" />
 		<echo>Deployed ${version.number} locally</echo>
 	</target>
 
