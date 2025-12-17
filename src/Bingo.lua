@@ -540,6 +540,9 @@ Bingo.commandList = {
 		["func"] = Bingo.ResetGame,
 		["help"] = {"", "Reset the system."},
 	},
+	["stop"] = {
+		["alias"] = "reset",
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
