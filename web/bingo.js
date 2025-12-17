@@ -41,7 +41,7 @@ function renderCard(container, cardId, csv) {
   const wrapper = document.createElement("div");
   wrapper.className = "card";
 
-  // --- Card header ---
+  // --- Header: Reset button left, Card ID right ---
   const header = document.createElement("div");
   header.className = "card-header";
 
@@ -75,7 +75,6 @@ function renderCard(container, cardId, csv) {
 
   for (let row = 0; row < 5; row++) {
     const tr = document.createElement("tr");
-
     for (let col = 0; col < 5; col++) {
       const index = col * 5 + row;
       const value = numbers[index];
@@ -95,13 +94,13 @@ function renderCard(container, cardId, csv) {
           savePunchState(cardId, punchState);
         };
       }
-
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
   }
 
   savePunchState(cardId, punchState);
+
   wrapper.appendChild(table);
   container.appendChild(wrapper);
 }
