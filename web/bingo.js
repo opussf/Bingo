@@ -41,6 +41,10 @@ function renderCard(container, cardId, csv) {
   const wrapper = document.createElement("div");
   wrapper.className = "card";
 
+  // --- Card header ---
+  const header = document.createElement("div");
+  header.className = "card-header";
+
   const reset = document.createElement("button");
   reset.textContent = "Reset";
   reset.onclick = () => {
@@ -49,6 +53,15 @@ function renderCard(container, cardId, csv) {
     loadCards();
   };
 
+  const title = document.createElement("div");
+  title.textContent = `Card ID: ${cardId}`;
+  title.className = "card-id";
+
+  header.appendChild(reset);
+  header.appendChild(title);
+  wrapper.appendChild(header);
+
+  // --- Table ---
   const table = document.createElement("table");
   table.innerHTML = `
     <thead>
@@ -58,7 +71,6 @@ function renderCard(container, cardId, csv) {
     </thead>
     <tbody></tbody>
   `;
-
   const tbody = table.querySelector("tbody");
 
   for (let row = 0; row < 5; row++) {
@@ -75,10 +87,7 @@ function renderCard(container, cardId, csv) {
         punchState[index] = true;
       } else {
         td.textContent = value;
-
-        if (punchState[index]) {
-          td.classList.add("punched");
-        }
+        if (punchState[index]) td.classList.add("punched");
 
         td.onclick = () => {
           punchState[index] = !punchState[index];
@@ -89,13 +98,10 @@ function renderCard(container, cardId, csv) {
 
       tr.appendChild(td);
     }
-
     tbody.appendChild(tr);
   }
 
   savePunchState(cardId, punchState);
-
-  wrapper.appendChild(reset);
   wrapper.appendChild(table);
   container.appendChild(wrapper);
 }
