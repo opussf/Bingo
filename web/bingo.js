@@ -1,8 +1,9 @@
 async function loadCard() {
-  // Extract ID from URL: /Bingo/<id>
-  const parts = window.location.pathname.split("/");
+  // URL format: /Bingo/<id>
+  const parts = window.location.pathname.split("/").filter(Boolean);
   const cardId = parts[parts.length - 1];
 
+  // Fetch Bingo.json from the SAME directory
   const response = await fetch("Bingo.json");
   const data = await response.json();
 
@@ -24,10 +25,11 @@ function renderBingo(numbers) {
     const tr = document.createElement("tr");
 
     for (let col = 0; col < 5; col++) {
-      const index = row * 5 + col;
       const td = document.createElement("td");
 
-      const value = numbers[index];
+      // COLUMN-MAJOR mapping
+      const value = numbers[col * 5 + row];
+
       if (value === 0) {
         td.textContent = "FREE";
         td.className = "free";
@@ -37,8 +39,10 @@ function renderBingo(numbers) {
 
       tr.appendChild(td);
     }
+
     tbody.appendChild(tr);
   }
 }
+
 
 loadCard();
