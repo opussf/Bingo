@@ -27,11 +27,11 @@ Maybe 30-45 seconds.
 
 ### Typical numbers are
 
-B  1-15
-I 16-30
-N 31-45
-G 46-60
-O 61-75
+* B  1-15
+* I 16-30
+* N 31-45
+* G 46-60
+* O 61-75
 
 ### Wow implementation
 
@@ -39,14 +39,10 @@ Need a game runner, and players.
 
 A game runner would:
 * Anounce a new game to Guild, Raid or Party `/bingo guild|raid|party`
-* Get feed back from whomever wants to play
-	* A game client responds
-		* Puts 2 buttons infront of the player
-		* Sends back acceptance or not.
-	* A player can express interest via chat.
 * Build and send cards to players
 	* A game client will be sent a card
 	* A player will be whispered a formatted card
+	* Players can return and request new cards anytime.
 * Pick and call out values to the choosen chat
 	* Also send values to clients
 		* Clients could see a list of values called
