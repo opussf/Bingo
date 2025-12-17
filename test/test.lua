@@ -278,6 +278,28 @@ function test.test_windetect_playerHasNoCard()
 	assertIsNil( Bingo_CurrentGame.stopped ) -- does not stop the game
 	assertEquals( "Frank-NoCard does not have a card!", Bingo.messageQueue["say"].queue[6] )
 end
+function test.test_resetGame()
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [10] = true, [19] = true, [40] = true, [59] = true, [73] = true }
+	Bingo.Command( "reset" )
+	assertIsNil( Bingo_CurrentGame.ball )
+	-- assertEquals( {}, Bingo_CurrentGame )
+	-- assertTrue( Bingo_CurrentGame.stoppedAt )
+end
+function test.test_stopGame()
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [10] = true, [19] = true, [40] = true, [59] = true, [73] = true }
+	Bingo.Command( "stop" )
+	assertIsNil( Bingo_CurrentGame.ball )
+	-- assertEquals( {}, Bingo_CurrentGame )
+	-- assertTrue( Bingo_CurrentGame.stoppedAt )
+end
 ---------- Bugs
 function test.test_b19_second_player_calling_bingo_should_not_also_win()
 	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
