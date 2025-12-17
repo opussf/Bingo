@@ -1,61 +1,73 @@
-let currentCardId = null;
-let punchState = [];
+let activeCardIds = [];
 
-async function loadCard() {
-  // URL format: /Bingo/<cardId>
+async function loadCards() {
+  // URL format: /Bingo/<id>[,<id>...]
   const parts = window.location.pathname.split("/").filter(Boolean);
-  currentCardId = parts[parts.length - 1];
+  const idPart = parts[parts.length - 1];
 
-  try {
-    const response = await fetch("Bingo.json");
-    const data = await response.json();
+  activeCardIds = idPart.split(",").slice(0, 10);
 
-    const card = data.cards.find(c => c.id === currentCardId);
-    if (!card) {
-      document.body.innerHTML = "<h1>Card not found</h1>";
-      return;
-    }
+  const response = await fetch("Bingo.json");
+  const data = await response.json();
 
-    const numbers = card.card.split(",").map(Number);
+  const container = document.getElementById("cards");
+  container.innerHTML = "";
 
-    loadPunchState();
-    renderBingo(numbers);
-  } catch (err) {
-    document.body.innerHTML = "<h1>Error loading Bingo.json</h1>";
+  for (const cardId of activeCardIds) {
+    const cardData = data.cards.find(c => c.id === cardId);
+    if (!cardData) continue;
+
+    renderCard(container, cardId, cardData.card);
   }
 }
 
-function storageKey() {
-  return `bingo:${currentCardId}`;
+function storageKey(cardId) {
+  return `bingo:${cardId}`;
 }
 
-function loadPunchState() {
-  const stored = localStorage.getItem(storageKey());
-  if (stored) {
-    punchState = JSON.parse(stored);
-  } else {
-    // default: all unpunched
+function loadPunchState(cardId) {
+  const stored = localStorage.getItem(storageKey(cardId));
+  return stored ? JSON.parse(stored) : Array(25).fill(false);
+}
+
+function savePunchState(cardId, state) {
+  localStorage.setItem(storageKey(cardId), JSON.stringify(state));
+}
+
+function renderCard(container, cardId, csv) {
+  const numbers = csv.split(",").map(Number);
+  let punchState = loadPunchState(cardId);
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "card";
+
+  const reset = document.createElement("button");
+  reset.textContent = "Reset";
+  reset.onclick = () => {
     punchState = Array(25).fill(false);
-  }
-}
+    localStorage.removeItem(storageKey(cardId));
+    loadCards();
+  };
 
-function savePunchState() {
-  localStorage.setItem(storageKey(), JSON.stringify(punchState));
-}
+  const table = document.createElement("table");
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>B</th><th>I</th><th>N</th><th>G</th><th>O</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
 
-function renderBingo(numbers) {
-  const tbody = document.querySelector("#bingo tbody");
-  tbody.innerHTML = "";
+  const tbody = table.querySelector("tbody");
 
   for (let row = 0; row < 5; row++) {
     const tr = document.createElement("tr");
 
     for (let col = 0; col < 5; col++) {
-      const td = document.createElement("td");
-
-      // Column-major index
       const index = col * 5 + row;
       const value = numbers[index];
+      const td = document.createElement("td");
 
       if (value === 0) {
         td.textContent = "FREE";
@@ -68,11 +80,11 @@ function renderBingo(numbers) {
           td.classList.add("punched");
         }
 
-        td.addEventListener("click", () => {
+        td.onclick = () => {
           punchState[index] = !punchState[index];
           td.classList.toggle("punched");
-          savePunchState();
-        });
+          savePunchState(cardId, punchState);
+        };
       }
 
       tr.appendChild(td);
@@ -81,13 +93,20 @@ function renderBingo(numbers) {
     tbody.appendChild(tr);
   }
 
-  savePunchState();
+  savePunchState(cardId, punchState);
+
+  wrapper.appendChild(reset);
+  wrapper.appendChild(table);
+  container.appendChild(wrapper);
 }
 
-document.getElementById("reset").addEventListener("click", () => {
-  punchState = Array(25).fill(false);
-  localStorage.removeItem(storageKey());
-  loadCard();
+/* ---------- GLOBAL RESET ---------- */
+
+document.getElementById("global-reset").addEventListener("click", () => {
+  for (const cardId of activeCardIds) {
+    localStorage.removeItem(storageKey(cardId));
+  }
+  loadCards();
 });
 
-loadCard();
+loadCards();
