@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bingo Card</title>
+<style>
+	body {
+		font-family: sans-serif;
+		display: flex;
+		justify-content: center;
+		padding-top: 40px;
+	}
+
+	table {
+		border-collapse: collapse;
+	}
+
+	th, td {
+		width: 70px;
+		height: 70px;
+		border: 2px solid black;
+		text-align: center;
+		font-size: 20px;
+	}
+
+	th {
+		background: #eee;
+		font-weight: bold;
+	}
+
+	.free {
+		background: gold;
+		font-weight: bold;
+	}
+</style>
+</head>
+<body>
+
+<table id="bingo">
+	<thead>
+		<tr>
+			<th>B</th><th>I</th><th>N</th><th>G</th><th>O</th>
+		</tr>
+	</thead>
+	<tbody></tbody>
+</table>
+
+<script src="bingo.js"></script>
+</body>
+</html>
