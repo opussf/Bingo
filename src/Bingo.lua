@@ -467,7 +467,7 @@ Bingo.CHAT_MSG_RAID_LEADER = Bingo.CHAT_MSG_
 Bingo.CHAT_MSG_RAID_WARNING = Bingo.CHAT_MSG_
 function Bingo.ResetGame()
 	Bingo_CurrentGame = {}
-	Bing.UnregisterEvents()
+	Bingo.UnregisterEvents()
 	Bingo.Print("Game has been reset")
 end
 function Bingo.PrintHelp()
