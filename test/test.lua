@@ -432,6 +432,17 @@ function test.test_windetect_Bingo_wExpiredPenality()
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt, "Game should be marked as ended." )
 	assertTrue( Bingo_CurrentGame.stopped, "Game should be marked as stopped." )
 end
+function test.test_windect_noBingo_wPenality_message()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [1] = true, [14] = true, [19] = true, [57] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win has incurred a 21 second calling penality.", Bingo.messageQueue.say.queue[7] )
+end
 
 --------- Corner cases
 function test.test_gameStructureIsRemade()

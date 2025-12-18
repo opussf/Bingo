@@ -463,8 +463,10 @@ function Bingo.CHAT_MSG_( self, msg, sender )
 					winner = Bingo.CheckForWinningCard( sender )
 				end
 				if not winner then
+					local penalitySeconds = Bingo.ballDelaySeconds * 3
 					Bingo_CurrentGame.penalityBox = Bingo_CurrentGame.penalityBox or {}
-					Bingo_CurrentGame.penalityBox[sender] = time() + (Bingo.ballDelaySeconds * 3)
+					Bingo_CurrentGame.penalityBox[sender] = time() + penalitySeconds
+					Bingo.QueueMessage( sender.." has incurred a "..penalitySeconds.." second calling penality." )
 				end
 			end
 		end
