@@ -404,7 +404,7 @@ function test.test_windetect_Bingo_wCurrentPenality()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.penalityBox = {["Frank-Win"] = time()}
+	Bingo_CurrentGame.penalityBox = {["Frank-Win"] = time() + 5}
 	-- player has current time penality
 	Bingo_CurrentGame.picked = { [1] = true, [5] = true, [9] = true, [17] = true, [37] = true, [58] = true, [66] = true }
 	-- picked balls allow Frank to win game

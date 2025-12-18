@@ -450,6 +450,7 @@ function Bingo.CHAT_MSG_WHISPER( self, msg, sender )
 end
 function Bingo.CHAT_MSG_( self, msg, sender )
 	msg = string.lower( msg )
+	local winner
 	-- Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
 	if Bingo_CurrentGame.startedAt
 		and Bingo_CurrentGame.startedAt < time()
@@ -457,7 +458,14 @@ function Bingo.CHAT_MSG_( self, msg, sender )
 		if strmatch( msg, "^[!]?bingo[!]?$") then
 			if strmatch( msg, "^!" ) or strmatch( msg, "!$" ) then
 				Bingo.SendMessage( sender.." has called BINGO!", Bingo_CurrentGame.channel )
-				Bingo.CheckForWinningCard( sender )
+				if (not Bingo_CurrentGame.penalityBox)  -- no one has a penality
+						or (Bingo_CurrentGame.penalityBox[sender] and Bingo_CurrentGame.penalityBox[sender] <= time()) then  -- sender has expired penality
+					winner = Bingo.CheckForWinningCard( sender )
+				end
+				if not winner then
+					Bingo_CurrentGame.penalityBox = Bingo_CurrentGame.penalityBox or {}
+					Bingo_CurrentGame.penalityBox[sender] = time() + (Bingo.ballDelaySeconds * 3)
+				end
 			end
 		end
 	end
