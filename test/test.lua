@@ -383,6 +383,66 @@ function test.test_game_GetsStopped()
 	Bingo.OnUpdate()
 	assertTrue( Bingo_CurrentGame.stopped )
 end
+function test.test_windect_noBingo_wPenality()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [1] = true, [14] = true, [19] = true, [57] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertTrue( Bingo_CurrentGame.penalityBox, "PenaltyBox table should exist." )
+	assertTrue( Bingo_CurrentGame.penalityBox["Frank-Win"], "Frank-Win has an entry." )
+	assertAlmostEquals( time()+21, Bingo_CurrentGame.penalityBox["Frank-Win"], "Should have timeout value. ")
+end
+function test.test_windetect_Bingo_wCurrentPenality()
+	-- Player has card
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- game started
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.penalityBox = {["Frank-Win"] = time() + 5}
+	-- player has current time penality
+	Bingo_CurrentGame.picked = { [1] = true, [5] = true, [9] = true, [17] = true, [37] = true, [58] = true, [66] = true }
+	-- picked balls allow Frank to win game
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	-- Calls for winDetect.
+	assertIsNil( Bingo_CurrentGame.winner, "No winner should be recorded." )
+	assertIsNil( Bingo_CurrentGame.endedAt, "Game should not be marked as ended." )
+	assertIsNil( Bingo_CurrentGame.stopped, "Game should not be stopped." )
+end
+function test.test_windetect_Bingo_wExpiredPenality()
+	-- Player has card
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- game started
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.penalityBox = {["Frank-Win"] = time()-25}
+	-- player has current time penality
+	Bingo_CurrentGame.picked = { [1] = true, [5] = true, [9] = true, [17] = true, [37] = true, [58] = true, [66] = true }
+	-- picked balls allow Frank to win game
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	-- Calls for winDetect.
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner, "Frank should be marked as winner." )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt, "Game should be marked as ended." )
+	assertTrue( Bingo_CurrentGame.stopped, "Game should be marked as stopped." )
+end
+function test.test_windect_noBingo_wPenality_message()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [1] = true, [14] = true, [19] = true, [57] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win has incurred a 21 second calling penality.", Bingo.messageQueue.say.queue[7] )
+end
 
 --------- Corner cases
 function test.test_gameStructureIsRemade()
