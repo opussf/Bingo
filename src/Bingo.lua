@@ -251,15 +251,18 @@ function Bingo.MakeCard()
 end
 function Bingo.AssignCards( player, minNumber )  -- !cards
 	Bingo.Print( "AssignCards( "..player..", "..(minNumber or "nil").." )" )
+	minNumber = tonumber(minNumber)
 	if minNumber then
-		minNumber = tonumber(minNumber)
 		if minNumber > 0 then
 			minNumber = math.min( minNumber, Bingo.cardLimit )
 			-- count the number of cards that the player has
 			local cardCount = 0
 			for hash, _ in pairs( Bingo_PlayerCards[player] or {} ) do
 				cardCount = cardCount + 1
-				Bingo.Print( cardCount.." -> "..hash )
+				if cardCount == 1 then
+					Bingo.QueueMessage( "Your card list:", player )
+				end
+				Bingo.QueueMessage( cardCount.." -> "..hash, player )
 			end
 			Bingo_PlayerCards[player] = Bingo_PlayerCards[player] or {}
 			for cardNum = cardCount+1, minNumber do
@@ -448,7 +451,9 @@ end
 function Bingo.CHAT_MSG_( self, msg, sender )
 	msg = string.lower( msg )
 	-- Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
-	if Bingo_CurrentGame.startedAt and Bingo_CurrentGame.startedAt < time() then
+	if Bingo_CurrentGame.startedAt
+		and Bingo_CurrentGame.startedAt < time()
+		and not Bingo_CurrentGame.endedAt then
 		if strmatch( msg, "^[!]?bingo[!]?$") then
 			if strmatch( msg, "^!" ) or strmatch( msg, "!$" ) then
 				Bingo.SendMessage( sender.." has called BINGO!", Bingo_CurrentGame.channel )
@@ -537,6 +542,9 @@ Bingo.commandList = {
 	["reset"] = {
 		["func"] = Bingo.ResetGame,
 		["help"] = {"", "Reset the system."},
+	},
+	["stop"] = {
+		["alias"] = "reset",
 	},
 }
 Bingo.bangCommands = {

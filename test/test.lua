@@ -8,6 +8,7 @@ test.coverageReportPercent = true
 ParseTOC( "../src/Bingo.toc" )
 
 function test.before()
+	myParty = { ["group"] = nil, ["raid"] = nil, ["roster"] = {} }
 	chatLog = {}
 	Bingo_PlayerCards = {}
 	Bingo_CurrentGame = {}
@@ -22,7 +23,13 @@ end
 -- Tests
 function test.test_helpFunction()
     Bingo.Command("help")
+	assertEquals( "|cffff6d00Bingo> |rBingo (@VERSION@) by opussf", chatLog[1].msg )
 end
+function test.test_unknownFunction_ShowsHelp()
+	Bingo.Command("meh")
+	assertEquals( "|cffff6d00Bingo> |rBingo (@VERSION@) by opussf", chatLog[1].msg )
+end
+
 function test.test_start_NewGame_sets_channel()
 	Bingo.Command("guild")
 	assertEquals( "guild", Bingo_CurrentGame.channel )
@@ -35,6 +42,48 @@ function test.test_start_NewGame_sets_picked()
 	Bingo.Command("guild")
 	assertTrue( Bingo_CurrentGame.picked )
 	assertIsNil( next( Bingo_CurrentGame.picked ) )
+end
+function test.test_gameSendsToRightChannel_guild()
+	Bingo.Command( "guild" )
+	Bingo.OnUpdate()
+	assertEquals( "GUILD", chatLog[2].chatType )
+end
+function test.test_gameSendsToRightChannel_raid()
+	myParty["raid"] = 1
+	Bingo.Command( "raid" )
+	Bingo.OnUpdate()
+	assertEquals( "RAID", chatLog[2].chatType )
+end
+function test.test_gameSendsToRightChannel_party()
+	myParty["party"] = 1
+	Bingo.Command( "party" )
+	Bingo.OnUpdate()
+	assertEquals( "PARTY", chatLog[2].chatType )
+end
+function test.test_gameSendsToRightChannel_yell()
+	Bingo.Command( "yell" )
+	Bingo.OnUpdate()
+	assertEquals( "YELL", chatLog[2].chatType )
+end
+function test.test_gameSendsToRightChannel_say()
+	Bingo.Command( "say" )
+	Bingo.OnUpdate()
+	assertEquals( "SAY", chatLog[2].chatType )
+end
+function test.test_cardCommand_whisper()
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
+	Bingo.OnUpdate()
+	assertEquals( "WHISPER", chatLog[2].chatType )
+end
+function test.test_cardCommand_hasCardAlready()
+	Bingo_PlayerCards["Otherplayer-Other Realm"] = {["12345678"] = "1,2,3,4,5"}
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
+	assertEquals( "Your card list:", Bingo.messageQueue["Otherplayer-Other Realm"].queue[1] )
+end
+function test.test_cardCommand_noNumber()
+	Bingo_PlayerCards["Otherplayer-Other Realm"] = {["12345678"] = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25"}
+	Bingo.CHAT_MSG_WHISPER( {}, "!cards", "Otherplayer-Other Realm" )
+	assertEquals( "These are your card ids:", Bingo.messageQueue["Otherplayer-Other Realm"].queue[1] )
 end
 
 function test.test_start_GameStillRunning()
@@ -265,6 +314,19 @@ function test.test_windetect_diag1_withExtras()
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
 	assertTrue( Bingo_CurrentGame.stopped )
 end
+function test.test_windect_noBingo()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [1] = true, [14] = true, [19] = true, [57] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertIsNil( Bingo_CurrentGame.winner )
+	assertIsNil( Bingo_CurrentGame.endedAt )
+	assertIsNil( Bingo_CurrentGame.stopped )
+end
 function test.test_windetect_playerHasNoCard()
 	-- setup the game
 	Bingo.Command( "say" )
@@ -277,6 +339,74 @@ function test.test_windetect_playerHasNoCard()
 	assertIsNil( Bingo_CurrentGame.endedAt ) -- does not end the game
 	assertIsNil( Bingo_CurrentGame.stopped ) -- does not stop the game
 	assertEquals( "Frank-NoCard does not have a card!", Bingo.messageQueue["say"].queue[6] )
+end
+function test.test_resetGame()
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [10] = true, [19] = true, [40] = true, [59] = true, [73] = true }
+	Bingo.Command( "reset" )
+	assertIsNil( Bingo_CurrentGame.ball )
+	-- assertEquals( {}, Bingo_CurrentGame )
+	-- assertTrue( Bingo_CurrentGame.stoppedAt )
+end
+function test.test_stopGame()
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [10] = true, [19] = true, [40] = true, [59] = true, [73] = true }
+	Bingo.Command( "stop" )
+	assertIsNil( Bingo_CurrentGame.ball )
+	-- assertEquals( {}, Bingo_CurrentGame )
+	-- assertTrue( Bingo_CurrentGame.stoppedAt )
+end
+function test.test_game_GetsStarted()
+	Bingo.Command( "say" )
+	Bingo_CurrentGame.initAt = 100
+	Bingo.OnUpdate()
+	assertAlmostEquals( time(), Bingo_CurrentGame.startedAt )
+	assertEquals( time(), Bingo_CurrentGame.lastBallAt )
+end
+function test.test_game_LastBallCalled()
+	Bingo.Command( "say" )
+	Bingo_CurrentGame.initAt = 100
+	Bingo_CurrentGame.ball = {}
+	Bingo.OnUpdate()
+	assertAlmostEquals( time() + Bingo.gameEndDelaySeconds, Bingo_CurrentGame.endedAt )
+end
+function test.test_game_GetsStopped()
+	Bingo.Command( "say" )
+	Bingo_CurrentGame.startedAt = time() -60
+	Bingo_CurrentGame.endedAt = time() - 10
+	Bingo.OnUpdate()
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+
+--------- Corner cases
+function test.test_gameStructureIsRemade()
+	Bingo_CurrentGame = nil
+	Bingo.OnUpdate()
+	assertTrue( Bingo_CurrentGame )
+end
+
+--------- Bugs
+function test.test_b19_second_player_calling_bingo_should_not_also_win()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	Bingo_PlayerCards["Mark-Win"] = {["01234567"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [1] = true, [14] = true, [19] = true, [57] = true, [66] = true, }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Mark-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner ) -- Mark is not seen as winner now.
 end
 
 test.run()
