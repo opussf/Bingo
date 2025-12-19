@@ -12,6 +12,7 @@ function test.before()
 	chatLog = {}
 	Bingo_PlayerCards = {}
 	Bingo_CurrentGame = {}
+	Bingo_Options = { variant = "line" }
 	Bingo.messageQueue = {}
 	Bingo.OnLoad()
 	Bingo.PLAYER_ENTERING_WORLD()
@@ -383,6 +384,7 @@ function test.test_game_GetsStopped()
 	Bingo.OnUpdate()
 	assertTrue( Bingo_CurrentGame.stopped )
 end
+-- Penality
 function test.test_windect_noBingo_wPenality()
 	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
 	-- setup the game
@@ -442,6 +444,22 @@ function test.test_windect_noBingo_wPenality_message()
 	Bingo_CurrentGame.picked = { [1] = true, [14] = true, [19] = true, [57] = true }
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win has incurred a 21 second calling penality.", Bingo.messageQueue.say.queue[7] )
+end
+-- Variations
+function test.test_windetect_box()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	Bingo.Command( "box" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	Bingo_CurrentGame.picked = { [14] = true, [10] = true,  [5] = true,  [1] = true,  [9] = true, [23] = true, [17] = true, [43] = true,
+			                     [37] = true, [49] = true, [58] = true, [67] = true, [73] = true, [72] = true, [68] = true, [66] = true }
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
 end
 
 --------- Corner cases
