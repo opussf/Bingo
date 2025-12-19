@@ -167,12 +167,11 @@ function Bingo.StartGame( chatToUse )
 		-- Clear Picked
 		Bingo_CurrentGame.picked = {}
 		Bingo_CurrentGame.variant = Bingo_Options.variant
-		Bingo_CurrentGame.winMasks = Bingo.variants[Bingo_CurrentGame.variant]()
+		Bingo_CurrentGame.winMasks = Bingo.variants[Bingo_CurrentGame.variant].func()
 		Bingo.RegisterEvents()
 		Bingo.Print("Game started for "..chatToUse)
 		Bingo.QueueMessage( Bingo.startMessages, chatToUse )
-		Bingo.QueueMessage( "Match this pattern to win: "..Bingo_CurrentGame.variant )
-
+		Bingo.QueueMessage( "Match this pattern to win: "..Bingo.variants[Bingo_CurrentGame.variant].text )
 	else
 		Bingo.Print( "A game is already in progress." )
 	end
@@ -596,7 +595,16 @@ Bingo.bangCommands = {
 		end,
 }
 Bingo.variants = {
-	["line"] = Bingo.MakeWinMask_line,
-	["box"] = Bingo.MakeWinMask_box,
-	["corners"] = Bingo.MakeWinMask_corners,
+	["line"] = {
+		func = Bingo.MakeWinMask_line,
+		text = "Any 1 line",
+	},
+	["box"] = {
+		func = Bingo.MakeWinMask_box,
+		text = "Box",
+	},
+	["corners"] = {
+		func = Bingo.MakeWinMask_corners,
+		text = "4 corners",
+	},
 }
