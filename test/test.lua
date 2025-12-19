@@ -708,6 +708,27 @@ function test.test_windetect_full_fail()
 	assertIsNil( Bingo_CurrentGame.endedAt )
 	assertIsNil( Bingo_CurrentGame.stopped )
 end
+function test.test_variants_reset_to_line()
+	-- set saved variant to box
+	Bingo_Options.variant = "box"
+	-- start game
+	Bingo.Command( "say" )
+	-- set variant
+	Bingo.Command( "line" )
+	-- stop and restart game
+	Bingo.Command( "stop" )
+	Bingo.Command( "say" )
+	assertEquals( "line", Bingo_CurrentGame.variant, "Current game should be line variant")
+end
+function test.test_variants_setVariantDoesNotChangeCurrentGame()
+	-- set saved variant to box
+	Bingo_Options.variant = "box"
+	-- start game
+	Bingo.Command( "say" )
+	Bingo.Command( "line" )
+	Bingo.Command( "say" )
+	assertEquals( "box", Bingo_CurrentGame.variant, "Current game should be box variant")
+end
 
 --------- Corner cases
 function test.test_gameStructureIsRemade()
