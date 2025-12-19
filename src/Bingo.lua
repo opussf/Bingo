@@ -382,6 +382,14 @@ end
 function Bingo.MakeWinMask_corners()
 	return { 17825809 }
 end
+function Bingo.MakeWinMask_tee()
+	return {
+		1113121, -- top
+		4325535, -- left
+		17329680, -- bottom
+		32637060, -- right
+	}
+end
 function Bingo.CheckForWinningCard( player )
 	-- Bingo.Print( "CheckForWinningCard( "..player.." )" )
 
@@ -499,6 +507,7 @@ function Bingo.SetVariant( variant )
 end
 function Bingo.PrintHelp()
 	Bingo.Print(Bingo.MSG_ADDONNAME.." ("..Bingo.MSG_VERSION..") by "..Bingo.MSG_AUTHOR)
+	-- Bingo.Print( "Current variant: "..Bingo.variants[Bingo_Options.variant].text.." ("..Bingo_Options)
 	for cmd, info in Bingo.spairs(Bingo.commandList) do
 		if info.help then
 			local cmdStr = cmd
@@ -580,6 +589,10 @@ Bingo.commandList = {
 		["func"] = function() Bingo.SetVariant("corners") end,
 		["help"] = {"", "Set game variant to corners."},
 	},
+	["tee"] = {
+		["func"] = function() Bingo.SetVariant("tee") end,
+		["help"] = {"", "Set game variant to T."},
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -606,5 +619,9 @@ Bingo.variants = {
 	["corners"] = {
 		func = Bingo.MakeWinMask_corners,
 		text = "4 corners",
+	},
+	["tee"] = {
+		func = Bingo.MakeWinMask_tee,
+		text = "T shape",
 	},
 }
