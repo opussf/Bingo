@@ -171,6 +171,7 @@ function Bingo.StartGame( chatToUse )
 		Bingo.RegisterEvents()
 		Bingo.Print("Game started for "..chatToUse)
 		Bingo.QueueMessage( Bingo.startMessages, chatToUse )
+		Bingo.QueueMessage( "Match this pattern to win: "..Bingo_CurrentGame.variant )
 
 	else
 		Bingo.Print( "A game is already in progress." )
@@ -379,6 +380,9 @@ end
 function Bingo.MakeWinMask_box()
 	return { 33080895 }
 end
+function Bingo.MakeWinMask_corners()
+	return { 17825809 }
+end
 function Bingo.CheckForWinningCard( player )
 	-- Bingo.Print( "CheckForWinningCard( "..player.." )" )
 
@@ -573,6 +577,10 @@ Bingo.commandList = {
 		["func"] = function() Bingo.SetVariant("box") end,
 		["help"] = {"", "Set game variant to box."},
 	},
+	["corners"] = {
+		["func"] = function() Bingo.SetVariant("corners") end,
+		["help"] = {"", "Set game variant to corners."},
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -590,4 +598,5 @@ Bingo.bangCommands = {
 Bingo.variants = {
 	["line"] = Bingo.MakeWinMask_line,
 	["box"] = Bingo.MakeWinMask_box,
+	["corners"] = Bingo.MakeWinMask_corners,
 }
