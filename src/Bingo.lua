@@ -394,6 +394,9 @@ end
 function Bingo.MakeWinMask_plus()
 	return { 4353156 }
 end
+function Bingo.MakeWinMask_full()
+	return { 33554431 }
+end
 
 function Bingo.CheckForWinningCard( player )
 	-- Bingo.Print( "CheckForWinningCard( "..player.." )" )

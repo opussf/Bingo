@@ -704,9 +704,9 @@ function test.test_windetect_full_fail()
 								 [48] = true, [59] = true, [46] = true, [57] = true, [58] = true,
 								 [67] = true, [73] = true, [72] = true, [68] = true, [66] = true }
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
-	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
-	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
-	assertTrue( Bingo_CurrentGame.stopped )
+	assertIsNil( Bingo_CurrentGame.winner )
+	assertIsNil( Bingo_CurrentGame.endedAt )
+	assertIsNil( Bingo_CurrentGame.stopped )
 end
 
 --------- Corner cases
