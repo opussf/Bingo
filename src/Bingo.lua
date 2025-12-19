@@ -388,6 +388,12 @@ function Bingo.MakeWinMask_tee()
 				17329680, -- bottom
 				32637060, } -- right
 end
+function Bingo.MakeWinMask_ex()
+	return { 18153809 }
+end
+function Bingo.MakeWinMask_plus()
+	return { 4353156 }
+end
 
 function Bingo.CheckForWinningCard( player )
 	-- Bingo.Print( "CheckForWinningCard( "..player.." )" )
