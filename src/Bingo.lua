@@ -499,7 +499,7 @@ function Bingo.SetVariant( variant )
 end
 function Bingo.PrintHelp()
 	Bingo.Print(Bingo.MSG_ADDONNAME.." ("..Bingo.MSG_VERSION..") by "..Bingo.MSG_AUTHOR)
-	for cmd, info in pairs(Bingo.commandList) do
+	for cmd, info in Bingo.spairs(Bingo.commandList) do
 		if info.help then
 			local cmdStr = cmd
 			for c2, i2 in pairs(Bingo.commandList) do
