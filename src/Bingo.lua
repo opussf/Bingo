@@ -15,6 +15,8 @@ Bingo.gameEndDelaySeconds = 30
 -- Init saved variables
 Bingo_PlayerCards = {}  -- { ["player"] = {["hash"] = {{2d array of card}} } }
 Bingo_CurrentGame = {}
+Bingo_Options = {}
+Bingo_Options.variant = "line"
 Bingo.messageQueue = {}
 Bingo.letters = {
 	[0] = "B",   --  1-15
@@ -114,7 +116,6 @@ function Bingo.OnLoad()
 end
 function Bingo.PLAYER_ENTERING_WORLD()
 	Bingo.RegisterEvents()
-	-- math.randomseed(time())
 end
 function Bingo.OnUpdate( elapsed )
 	-- handle message Queue
@@ -165,10 +166,12 @@ function Bingo.StartGame( chatToUse )
 		end
 		-- Clear Picked
 		Bingo_CurrentGame.picked = {}
+		Bingo_CurrentGame.variant = Bingo_Options.variant
+		Bingo_CurrentGame.winMasks = Bingo.variants[Bingo_CurrentGame.variant].func()
 		Bingo.RegisterEvents()
 		Bingo.Print("Game started for "..chatToUse)
 		Bingo.QueueMessage( Bingo.startMessages, chatToUse )
-
+		Bingo.QueueMessage( "Match this pattern to win: "..Bingo.variants[Bingo_CurrentGame.variant].text )
 	else
 		Bingo.Print( "A game is already in progress." )
 	end
@@ -334,14 +337,14 @@ function Bingo.ReturnCard( player, hash )  -- !return
 		Bingo.QueueMessage( "You have no cards to return.", player )
 	end
 end
-function Bingo.MakeWinMasks()
-	-- masks are bit places
-	-- 0, 5, 10, 15, 20
-	-- 1, 6, 11, 16, 21
-	-- 2, 7, 12, 17, 22,
-	-- 3, 8, 13, 18, 23,
-	-- 4, 9, 14, 19, 24
-	Bingo.WIN_MASKS = {}
+-- masks are bit places
+-- 0, 5, 10, 15, 20
+-- 1, 6, 11, 16, 21
+-- 2, 7, 12, 17, 22,
+-- 3, 8, 13, 18, 23,
+-- 4, 9, 14, 19, 24
+function Bingo.MakeWinMask_line()
+	local winMasks = {}
 
 	-- columns
 	for c = 0, 4 do
@@ -350,7 +353,7 @@ function Bingo.MakeWinMasks()
 			-- mask = mask | (1 << ( r * 5 + c ))
 			mask = bit.bor( mask, bit.lshift(1, (c*5+r)) )
 		end
-		table.insert( Bingo.WIN_MASKS, mask )
+		table.insert( winMasks, mask )
 	end
 	-- rows
 	for r = 0, 4 do
@@ -358,25 +361,45 @@ function Bingo.MakeWinMasks()
 		for c = 0, 4 do
 			mask = bit.bor( mask, bit.lshift(1, (c*5+r)) )
 		end
-		table.insert( Bingo.WIN_MASKS, mask )
+		table.insert( winMasks, mask )
 	end
 	-- Diagonals
-	table.insert( Bingo.WIN_MASKS, bit.bor( bit.lshift( 1, 0 ),
+	table.insert( winMasks, bit.bor( bit.lshift( 1, 0 ),
 							 	bit.bor( bit.lshift( 1, 6 ),
 							 		bit.bor( bit.lshift( 1, 12 ),
 							 			bit.bor( bit.lshift( 1, 18),
 							 				bit.lshift( 1, 24 ) ) ) ) ) )
-	table.insert( Bingo.WIN_MASKS, bit.bor( bit.lshift( 1, 4 ),
+	table.insert( winMasks, bit.bor( bit.lshift( 1, 4 ),
 								bit.bor( bit.lshift( 1, 8 ),
 									bit.bor( bit.lshift( 1, 12 ),
 										bit.bor( bit.lshift( 1, 16 ),
 											bit.lshift( 1, 20 ) ) ) ) ) )
+	return winMasks
 end
+function Bingo.MakeWinMask_box()
+	return { 33080895 }
+end
+function Bingo.MakeWinMask_corners()
+	return { 17825809 }
+end
+function Bingo.MakeWinMask_tee()
+	return {	1113121, -- top
+				4325535, -- left
+				17329680, -- bottom
+				32637060, } -- right
+end
+function Bingo.MakeWinMask_ex()
+	return { 18153809 }
+end
+function Bingo.MakeWinMask_plus()
+	return { 4353156 }
+end
+function Bingo.MakeWinMask_full()
+	return { 33554431 }
+end
+
 function Bingo.CheckForWinningCard( player )
 	-- Bingo.Print( "CheckForWinningCard( "..player.." )" )
-	if not Bingo.WIN_MASKS then
-		Bingo.MakeWinMasks()
-	end
 
 	if Bingo_PlayerCards[player] then
 		for hash, cardStr in pairs( Bingo_PlayerCards[player] ) do
@@ -392,7 +415,7 @@ function Bingo.CheckForWinningCard( player )
 				-- print( place-1, value, bitCard )
 			end
 
-			for _, winMask in ipairs( Bingo.WIN_MASKS ) do
+			for _, winMask in ipairs( Bingo_CurrentGame.winMasks ) do
 				-- print( "Does "..bit.band( bitCard, winMask ).." = "..winMask.."?" )
 				if bit.band( bitCard, winMask ) == winMask then
 					Bingo.QueueMessage( player.." has won the game!" )
@@ -485,9 +508,15 @@ function Bingo.ResetGame()
 	Bingo.UnregisterEvents()
 	Bingo.Print("Game has been reset")
 end
+function Bingo.SetVariant( variant )
+	if Bingo.variants[variant] then
+		Bingo_Options.variant = variant
+	end
+end
 function Bingo.PrintHelp()
 	Bingo.Print(Bingo.MSG_ADDONNAME.." ("..Bingo.MSG_VERSION..") by "..Bingo.MSG_AUTHOR)
-	for cmd, info in pairs(Bingo.commandList) do
+	-- Bingo.Print( "Current variant: "..Bingo.variants[Bingo_Options.variant].text.." ("..Bingo_Options)
+	for cmd, info in Bingo.spairs(Bingo.commandList) do
 		if info.help then
 			local cmdStr = cmd
 			for c2, i2 in pairs(Bingo.commandList) do
@@ -556,6 +585,34 @@ Bingo.commandList = {
 	["stop"] = {
 		["alias"] = "reset",
 	},
+	["line"] = {
+		["func"] = function() Bingo.SetVariant("line") end,
+		["help"] = {"", "Set game variant to line."},
+	},
+	["box"] = {
+		["func"] = function() Bingo.SetVariant("box") end,
+		["help"] = {"", "Set game variant to box."},
+	},
+	["corners"] = {
+		["func"] = function() Bingo.SetVariant("corners") end,
+		["help"] = {"", "Set game variant to corners."},
+	},
+	["tee"] = {
+		["func"] = function() Bingo.SetVariant("tee") end,
+		["help"] = {"", "Set game variant to T."},
+	},
+	["ex"] = {
+		["func"] = function() Bingo.SetVariant("ex") end,
+		["help"] = {"", "Set game variant to X."},
+	},
+	["plus"] = {
+		["func"] = function() Bingo.SetVariant("plus") end,
+		["help"] = {"", "Set game variant to +."},
+	},
+	["full"] = {
+		["func"] = function() Bingo.SetVariant("full") end,
+		["help"] = {"", "Set game variant to full house."},
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -569,4 +626,34 @@ Bingo.bangCommands = {
 	["!tips"] = function( player )
 			Bingo.QueueMessage( Bingo.tipMessages, player )
 		end,
+}
+Bingo.variants = {
+	["line"] = {
+		func = Bingo.MakeWinMask_line,
+		text = "Any 1 line",
+	},
+	["box"] = {
+		func = Bingo.MakeWinMask_box,
+		text = "Box",
+	},
+	["corners"] = {
+		func = Bingo.MakeWinMask_corners,
+		text = "4 corners",
+	},
+	["tee"] = {
+		func = Bingo.MakeWinMask_tee,
+		text = "T shape",
+	},
+	["ex"] = {
+		func = Bingo.MakeWinMask_ex,
+		text = "X shape",
+	},
+	["plus"] = {
+		func = Bingo.MakeWinMask_plus,
+		text = "+ shape",
+	},
+	["full"] = {
+		func = Bingo.MakeWinMask_full,
+		text = "Full house",
+	},
 }
