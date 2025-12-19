@@ -383,13 +383,12 @@ function Bingo.MakeWinMask_corners()
 	return { 17825809 }
 end
 function Bingo.MakeWinMask_tee()
-	return {
-		1113121, -- top
-		4325535, -- left
-		17329680, -- bottom
-		32637060, -- right
-	}
+	return {	1113121, -- top
+				4325535, -- left
+				17329680, -- bottom
+				32637060, } -- right
 end
+
 function Bingo.CheckForWinningCard( player )
 	-- Bingo.Print( "CheckForWinningCard( "..player.." )" )
 
@@ -593,6 +592,18 @@ Bingo.commandList = {
 		["func"] = function() Bingo.SetVariant("tee") end,
 		["help"] = {"", "Set game variant to T."},
 	},
+	["ex"] = {
+		["func"] = function() Bingo.SetVariant("ex") end,
+		["help"] = {"", "Set game variant to X."},
+	},
+	["plus"] = {
+		["func"] = function() Bingo.SetVariant("plus") end,
+		["help"] = {"", "Set game variant to +."},
+	},
+	["full"] = {
+		["func"] = function() Bingo.SetVariant("full") end,
+		["help"] = {"", "Set game variant to full house."},
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -623,5 +634,17 @@ Bingo.variants = {
 	["tee"] = {
 		func = Bingo.MakeWinMask_tee,
 		text = "T shape",
+	},
+	["ex"] = {
+		func = Bingo.MakeWinMask_ex,
+		text = "X shape",
+	},
+	["plus"] = {
+		func = Bingo.MakeWinMask_plus,
+		text = "+ shape",
+	},
+	["full"] = {
+		func = Bingo.MakeWinMask_full,
+		text = "Full house",
 	},
 }
