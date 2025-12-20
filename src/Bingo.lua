@@ -254,7 +254,13 @@ function Bingo.MakeCard()
 	return hash, cardString
 end
 function Bingo.AddOwnCard( player, csvIn )  -- !new
+	-- build this just like the MakeCard() system.
 	Bingo.Print( "AddOwnCard( "..player..", "..(csvIn or "nil").." )" )
+
+	local card = {{},{},{},{},{}}
+
+
+	local test = string.match()
 
 end
 function Bingo.AssignCards( player, minNumber )  -- !cards
