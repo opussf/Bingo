@@ -488,7 +488,7 @@ function Bingo.CHAT_MSG_( self, msg, sender )
 	-- Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
 	if Bingo_CurrentGame.startedAt
 		and Bingo_CurrentGame.startedAt < time()
-		and not Bingo_CurrentGame.endedAt then
+		and not Bingo_CurrentGame.stopped then
 		if strmatch( msg, "^[!]?bingo[!]?$") then
 			if strmatch( msg, "^!" ) or strmatch( msg, "!$" ) then
 				Bingo.SendMessage( sender.." has called BINGO!", Bingo_CurrentGame.channel )
@@ -522,6 +522,8 @@ end
 function Bingo.SetVariant( variant )
 	if Bingo.variants[variant] then
 		Bingo_Options.variant = variant
+		Bingo.Print( "Next game is set for this variant: "..variant )
+		Bingo.Print( "Match: "..Bingo.variants[variant].text )
 	end
 end
 function Bingo.PrintHelp()

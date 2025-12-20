@@ -768,5 +768,42 @@ function test.test_b19_second_player_calling_bingo_should_not_also_win()
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Mark-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner ) -- Mark is not seen as winner now.
 end
+function test.test_b31_all_balls_spent_bingo_does_not_work()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-125
+	Bingo_CurrentGame.startedAt = time()-65
+	Bingo_CurrentGame.lastBallAt = time()-8
+	Bingo_CurrentGame.ball = { 75 }
+	Bingo_CurrentGame.picked = { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+								 true, true, true, true, true, true, true, true, true, true, true, true, true, true }
+	Bingo.OnUpdate()
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt, nil, nil, 1 )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_stopped_game_is_stopped()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-125
+	Bingo_CurrentGame.startedAt = time()-65
+	Bingo_CurrentGame.lastBallAt = time()-8
+	Bingo_CurrentGame.ball = { 75 }
+	Bingo_CurrentGame.picked = { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+								 true, true, true, true, true, true, true, true, true, true, true, true, true, true }
+	Bingo.OnUpdate()
+	Bingo_CurrentGame.endedAt = time()-31
+	Bingo_CurrentGame.stopped = true
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	test.dump( Bingo_CurrentGame )
+	assertIsNil( Bingo_CurrentGame.winner )
+end
 
 test.run()
