@@ -39,6 +39,7 @@ Bingo.helpMessages = {
 	"! list - list the card hashes",
 	"! show <hash> - shows card that match the hash.",
 	"! return <hash>||all - return card that matches the hash.",
+	"! new <25 digit csv of card> - add your own card.",
 	"! tips - to show some helpful tips on playing."
 }
 Bingo.tipMessages = {
@@ -251,6 +252,10 @@ function Bingo.MakeCard()
 		buildCard = usedHashes[hash] -- set to nil (falsey) if not used already
 	end
 	return hash, cardString
+end
+function Bingo.AddOwnCard( player, csvIn )  -- !new
+	Bingo.Print( "AddOwnCard( "..player..", "..(csvIn or "nil").." )" )
+
 end
 function Bingo.AssignCards( player, minNumber )  -- !cards
 	Bingo.Print( "AssignCards( "..player..", "..(minNumber or "nil").." )" )
@@ -626,6 +631,7 @@ Bingo.bangCommands = {
 	["!tips"] = function( player )
 			Bingo.QueueMessage( Bingo.tipMessages, player )
 		end,
+	["!new"] = Bingo.AddOwnCard,
 }
 Bingo.variants = {
 	["line"] = {

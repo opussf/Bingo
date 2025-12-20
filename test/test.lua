@@ -124,9 +124,9 @@ function test.test_bangCommands_help_toPlayer()
 	Bingo.CHAT_MSG_WHISPER( {}, "!help", "Otherplayer-Other Realm" )
 	assertTrue( Bingo.messageQueue["Otherplayer-Other Realm"] )
 end
-function test.test_bangCommands_help_queue_has_7()
+function test.test_bangCommands_help_queue_has_8()
 	Bingo.CHAT_MSG_WHISPER( {}, "!help", "Otherplayer-Other Realm" )
-	assertEquals( 7, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
+	assertEquals( 8, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
 end
 function test.test_bangCommands_cards_one()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
@@ -735,6 +735,20 @@ function test.test_gameStructureIsRemade()
 	Bingo_CurrentGame = nil
 	Bingo.OnUpdate()
 	assertTrue( Bingo_CurrentGame )
+end
+
+--------- Player Cards
+function test.test_playerCard_playerAddsCard_Vertical()
+	Bingo.CHAT_MSG_WHISPER( {}, "!new 14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66", "Vader-Card" )
+	test.dump(chatLog)
+	test.dump(Bingo.messageQueue)
+	assertEquals( "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66", Bingo_PlayerCards["Vader-Card"]["e1211770"] )
+end
+function test.test_playerCard_playerAddsCard_Horizontal()
+	Bingo.CHAT_MSG_WHISPER( {}, "!new 14,23,43,49,67,10,19,40,59,73,5,30,0,46,72,1,29,31,57,68,9,17,37,58,66", "Vader-Card" )
+	test.dump(chatLog)
+	test.dump(Bingo.messageQueue)
+	assertEquals( "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66", Bingo_PlayerCards["Vader-Card"]["e1211770"] )
 end
 
 --------- Bugs
