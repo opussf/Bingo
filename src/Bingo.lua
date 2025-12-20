@@ -511,6 +511,8 @@ end
 function Bingo.SetVariant( variant )
 	if Bingo.variants[variant] then
 		Bingo_Options.variant = variant
+		Bingo.Print( "Next game is set for this variant: "..variant )
+		Bingo.Print( "Match: "..Bingo.variants[variant].text )
 	end
 end
 function Bingo.PrintHelp()
