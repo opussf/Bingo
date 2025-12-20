@@ -124,9 +124,9 @@ function test.test_bangCommands_help_toPlayer()
 	Bingo.CHAT_MSG_WHISPER( {}, "!help", "Otherplayer-Other Realm" )
 	assertTrue( Bingo.messageQueue["Otherplayer-Other Realm"] )
 end
-function test.test_bangCommands_help_queue_has_7()
+function test.test_bangCommands_help_queue_has_8()
 	Bingo.CHAT_MSG_WHISPER( {}, "!help", "Otherplayer-Other Realm" )
-	assertEquals( 7, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
+	assertEquals( 8, #Bingo.messageQueue["Otherplayer-Other Realm"].queue )
 end
 function test.test_bangCommands_cards_one()
 	Bingo.CHAT_MSG_WHISPER( {}, "!cards 1", "Otherplayer-Other Realm" )
@@ -729,6 +729,46 @@ function test.test_variants_setVariantDoesNotChangeCurrentGame()
 	Bingo.Command( "say" )
 	assertEquals( "box", Bingo_CurrentGame.variant, "Current game should be box variant")
 end
+function test.test_new_create_playerCard_vertical()
+	Bingo.CHAT_MSG_WHISPER( {}, "!new 14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66", "New-Card" )
+	-- card is added, and sends message to player with id.
+	assertEquals( "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66", Bingo_PlayerCards["New-Card"]["e1211770"] )
+	assertEquals( "e1211770 is your new card's id.", Bingo.messageQueue["New-Card"].queue[1] )
+end
+function test.test_new_create_playerCard_vertical_badCard_isMissingANumber()
+	Bingo.CHAT_MSG_WHISPER( {}, "!new 14,10,5,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66", "New-Card" )
+	-- card is not added, and sends error message to player.
+	assertIsNil( Bingo_PlayerCards["New-Card"] )
+	assertEquals( "There was something wrong with the card you gave. Please resubmit.", Bingo.messageQueue["New-Card"].queue[1] )
+end
+function test.test_new_create_playerCard_vertical_badCard_extraB_notEnoughI()
+	Bingo.CHAT_MSG_WHISPER( {}, "!new 14,10,5,1,9,11,12,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66", "New-Card" )
+	assertIsNil( Bingo_PlayerCards["New-Card"] )
+	assertEquals( "There was something wrong with the card you gave. Please resubmit.", Bingo.messageQueue["New-Card"].queue[1] )
+end
+function test.test_new_create_playerCard_vertical_badCard_allSame()
+	Bingo.CHAT_MSG_WHISPER( {}, "!new 1,1,1,1,1,16,16,16,16,16,31,31,31,31,31,46,46,46,46,46,61,61,61,61,61", "New-Card" )
+	assertIsNil( Bingo_PlayerCards["New-Card"] )
+	assertEquals( "There was something wrong with the card you gave. Please resubmit.", Bingo.messageQueue["New-Card"].queue[1] )
+end
+function test.test_new_create_playerCard_horizontal()
+	Bingo.CHAT_MSG_WHISPER( {}, "!new 14,23,43,49,67,10,19,40,59,73,5,30,0,46,72,1,29,31,57,68,9,17,37,58,66", "New-Card" )
+	assertEquals( "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66", Bingo_PlayerCards["New-Card"]["e1211770"] )
+	assertEquals( "e1211770 is your new card's id.", Bingo.messageQueue["New-Card"].queue[1] )
+end
+function test.test_new_create_playerCard_cardIsUsedByOtherPlayer()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	Bingo.CHAT_MSG_WHISPER( {}, "!new 14,23,43,49,67,10,19,40,59,73,5,30,0,46,72,1,29,31,57,68,9,17,37,58,66", "New-Card" )
+	assertIsNil( Bingo_PlayerCards["New-Card"] )
+	assertEquals( "Someone else has that card.", Bingo.messageQueue["New-Card"].queue[1] )
+end
+function test.test_new_create_playerCard_cardIsDuplicate()
+	Bingo_PlayerCards["New-Card"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	Bingo.CHAT_MSG_WHISPER( {}, "!new 14,23,43,49,67,10,19,40,59,73,5,30,0,46,72,1,29,31,57,68,9,17,37,58,66", "New-Card" )
+	-- card is still there, and user knows it.
+	assertEquals( "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66", Bingo_PlayerCards["New-Card"]["e1211770"] )
+	assertEquals( "e1211770 is already your card.", Bingo.messageQueue["New-Card"].queue[1] )
+end
 
 --------- Corner cases
 function test.test_gameStructureIsRemade()
@@ -788,7 +828,6 @@ function test.test_stopped_game_is_stopped()
 	Bingo_CurrentGame.endedAt = time()-31
 	Bingo_CurrentGame.stopped = true
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
-	test.dump( Bingo_CurrentGame )
 	assertIsNil( Bingo_CurrentGame.winner )
 end
 

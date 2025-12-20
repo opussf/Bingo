@@ -39,6 +39,7 @@ Bingo.helpMessages = {
 	"! list - list the card hashes",
 	"! show <hash> - shows card that match the hash.",
 	"! return <hash>||all - return card that matches the hash.",
+	"! new <25 digit csv of card> - add your own card.",
 	"! tips - to show some helpful tips on playing."
 }
 Bingo.tipMessages = {
@@ -251,6 +252,60 @@ function Bingo.MakeCard()
 		buildCard = usedHashes[hash] -- set to nil (falsey) if not used already
 	end
 	return hash, cardString
+end
+function Bingo.AddOwnCard( player, csvIn )  -- !new
+	-- build this just like the MakeCard() system.
+	-- Bingo.Print( "AddOwnCard( "..player..", "..(csvIn or "nil").." )" )
+
+	local hash
+	local usedHashes = {}
+	for _, cards in pairs( Bingo_PlayerCards ) do
+		for hash in pairs( cards ) do
+			usedHashes[hash] = true
+		end
+	end
+
+	local card = {{},{},{},{},{}}  -- are these columns or rows?  default would be columns
+
+	local filledColumns = 0
+	local usedNumbers = {}
+	for val in string.gmatch( csvIn, "([^,]+)") do
+
+		local col = tonumber(val) > 0 and math.floor((val-1)/15) or 2
+		-- print( val, col, Bingo.letters[col] )
+
+		if #card[col+1] < 5 and not usedNumbers[val] then
+			table.insert( card[col+1], val )
+			usedNumbers[val] = true
+			if #card[col+1] == 5 then
+				filledColumns = filledColumns + 2^col
+			end
+		end
+	end
+	if filledColumns == 31 then -- all columns are full == is valid card.
+		-- set the free spot
+		card[3][3] = 0
+		local cardString = string.format("%s,%s,%s,%s,%s",
+			table.concat(card[1],","),
+			table.concat(card[2],","),
+			table.concat(card[3],","),
+			table.concat(card[4],","),
+			table.concat(card[5],",")
+		)
+		hash = Bingo.FNV1a( cardString )
+		if not usedHashes[hash] then -- this is a good card so far (add to the player's cards)
+			Bingo_PlayerCards[player] = Bingo_PlayerCards[player] or {}
+			Bingo_PlayerCards[player][hash] = cardString
+			Bingo.QueueMessage( hash.." is your new card's id.", player )
+		elseif Bingo_PlayerCards[player] and Bingo_PlayerCards[player][hash] then  -- is yours
+			Bingo.QueueMessage( hash.." is already your card.", player )
+		else -- is someone elses
+			Bingo.QueueMessage( "Someone else has that card.", player )
+		end
+	else
+		Bingo.QueueMessage( "There was something wrong with the card you gave. Please resubmit.", player )
+	end
+
 end
 function Bingo.AssignCards( player, minNumber )  -- !cards
 	Bingo.Print( "AssignCards( "..player..", "..(minNumber or "nil").." )" )
@@ -628,6 +683,7 @@ Bingo.bangCommands = {
 	["!tips"] = function( player )
 			Bingo.QueueMessage( Bingo.tipMessages, player )
 		end,
+	["!new"] = Bingo.AddOwnCard,
 }
 Bingo.variants = {
 	["line"] = {
