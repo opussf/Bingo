@@ -15,6 +15,8 @@ Bingo.gameEndDelaySeconds = 30
 -- Init saved variables
 Bingo_PlayerCards = {}  -- { ["player"] = {["hash"] = {{2d array of card}} } }
 Bingo_CurrentGame = {}
+Bingo_Options = {}
+Bingo_Options.variant = "line"
 Bingo.messageQueue = {}
 Bingo.letters = {
 	[0] = "B",   --  1-15
@@ -37,6 +39,7 @@ Bingo.helpMessages = {
 	"! list - list the card hashes",
 	"! show <hash> - shows card that match the hash.",
 	"! return <hash>||all - return card that matches the hash.",
+	"! new <25 digit csv of card> - add your own card.",
 	"! tips - to show some helpful tips on playing."
 }
 Bingo.tipMessages = {
@@ -114,7 +117,6 @@ function Bingo.OnLoad()
 end
 function Bingo.PLAYER_ENTERING_WORLD()
 	Bingo.RegisterEvents()
-	-- math.randomseed(time())
 end
 function Bingo.OnUpdate( elapsed )
 	-- handle message Queue
@@ -165,10 +167,12 @@ function Bingo.StartGame( chatToUse )
 		end
 		-- Clear Picked
 		Bingo_CurrentGame.picked = {}
+		Bingo_CurrentGame.variant = Bingo_Options.variant
+		Bingo_CurrentGame.winMasks = Bingo.variants[Bingo_CurrentGame.variant].func()
 		Bingo.RegisterEvents()
 		Bingo.Print("Game started for "..chatToUse)
 		Bingo.QueueMessage( Bingo.startMessages, chatToUse )
-
+		Bingo.QueueMessage( "Match this pattern to win: "..Bingo.variants[Bingo_CurrentGame.variant].text )
 	else
 		Bingo.Print( "A game is already in progress." )
 	end
@@ -248,6 +252,60 @@ function Bingo.MakeCard()
 		buildCard = usedHashes[hash] -- set to nil (falsey) if not used already
 	end
 	return hash, cardString
+end
+function Bingo.AddOwnCard( player, csvIn )  -- !new
+	-- build this just like the MakeCard() system.
+	-- Bingo.Print( "AddOwnCard( "..player..", "..(csvIn or "nil").." )" )
+
+	local hash
+	local usedHashes = {}
+	for _, cards in pairs( Bingo_PlayerCards ) do
+		for hash in pairs( cards ) do
+			usedHashes[hash] = true
+		end
+	end
+
+	local card = {{},{},{},{},{}}  -- are these columns or rows?  default would be columns
+
+	local filledColumns = 0
+	local usedNumbers = {}
+	for val in string.gmatch( csvIn, "([^,]+)") do
+
+		local col = tonumber(val) > 0 and math.floor((val-1)/15) or 2
+		-- print( val, col, Bingo.letters[col] )
+
+		if #card[col+1] < 5 and not usedNumbers[val] then
+			table.insert( card[col+1], val )
+			usedNumbers[val] = true
+			if #card[col+1] == 5 then
+				filledColumns = filledColumns + 2^col
+			end
+		end
+	end
+	if filledColumns == 31 then -- all columns are full == is valid card.
+		-- set the free spot
+		card[3][3] = 0
+		local cardString = string.format("%s,%s,%s,%s,%s",
+			table.concat(card[1],","),
+			table.concat(card[2],","),
+			table.concat(card[3],","),
+			table.concat(card[4],","),
+			table.concat(card[5],",")
+		)
+		hash = Bingo.FNV1a( cardString )
+		if not usedHashes[hash] then -- this is a good card so far (add to the player's cards)
+			Bingo_PlayerCards[player] = Bingo_PlayerCards[player] or {}
+			Bingo_PlayerCards[player][hash] = cardString
+			Bingo.QueueMessage( hash.." is your new card's id.", player )
+		elseif Bingo_PlayerCards[player] and Bingo_PlayerCards[player][hash] then  -- is yours
+			Bingo.QueueMessage( hash.." is already your card.", player )
+		else -- is someone elses
+			Bingo.QueueMessage( "Someone else has that card.", player )
+		end
+	else
+		Bingo.QueueMessage( "There was something wrong with the card you gave. Please resubmit.", player )
+	end
+
 end
 function Bingo.AssignCards( player, minNumber )  -- !cards
 	Bingo.Print( "AssignCards( "..player..", "..(minNumber or "nil").." )" )
@@ -334,14 +392,14 @@ function Bingo.ReturnCard( player, hash )  -- !return
 		Bingo.QueueMessage( "You have no cards to return.", player )
 	end
 end
-function Bingo.MakeWinMasks()
-	-- masks are bit places
-	-- 0, 5, 10, 15, 20
-	-- 1, 6, 11, 16, 21
-	-- 2, 7, 12, 17, 22,
-	-- 3, 8, 13, 18, 23,
-	-- 4, 9, 14, 19, 24
-	Bingo.WIN_MASKS = {}
+-- masks are bit places
+-- 0, 5, 10, 15, 20
+-- 1, 6, 11, 16, 21
+-- 2, 7, 12, 17, 22,
+-- 3, 8, 13, 18, 23,
+-- 4, 9, 14, 19, 24
+function Bingo.MakeWinMask_line()
+	local winMasks = {}
 
 	-- columns
 	for c = 0, 4 do
@@ -350,7 +408,7 @@ function Bingo.MakeWinMasks()
 			-- mask = mask | (1 << ( r * 5 + c ))
 			mask = bit.bor( mask, bit.lshift(1, (c*5+r)) )
 		end
-		table.insert( Bingo.WIN_MASKS, mask )
+		table.insert( winMasks, mask )
 	end
 	-- rows
 	for r = 0, 4 do
@@ -358,25 +416,45 @@ function Bingo.MakeWinMasks()
 		for c = 0, 4 do
 			mask = bit.bor( mask, bit.lshift(1, (c*5+r)) )
 		end
-		table.insert( Bingo.WIN_MASKS, mask )
+		table.insert( winMasks, mask )
 	end
 	-- Diagonals
-	table.insert( Bingo.WIN_MASKS, bit.bor( bit.lshift( 1, 0 ),
+	table.insert( winMasks, bit.bor( bit.lshift( 1, 0 ),
 							 	bit.bor( bit.lshift( 1, 6 ),
 							 		bit.bor( bit.lshift( 1, 12 ),
 							 			bit.bor( bit.lshift( 1, 18),
 							 				bit.lshift( 1, 24 ) ) ) ) ) )
-	table.insert( Bingo.WIN_MASKS, bit.bor( bit.lshift( 1, 4 ),
+	table.insert( winMasks, bit.bor( bit.lshift( 1, 4 ),
 								bit.bor( bit.lshift( 1, 8 ),
 									bit.bor( bit.lshift( 1, 12 ),
 										bit.bor( bit.lshift( 1, 16 ),
 											bit.lshift( 1, 20 ) ) ) ) ) )
+	return winMasks
 end
+function Bingo.MakeWinMask_box()
+	return { 33080895 }
+end
+function Bingo.MakeWinMask_corners()
+	return { 17825809 }
+end
+function Bingo.MakeWinMask_tee()
+	return {	1113121, -- top
+				4325535, -- left
+				17329680, -- bottom
+				32637060, } -- right
+end
+function Bingo.MakeWinMask_ex()
+	return { 18153809 }
+end
+function Bingo.MakeWinMask_plus()
+	return { 4353156 }
+end
+function Bingo.MakeWinMask_full()
+	return { 33554431 }
+end
+
 function Bingo.CheckForWinningCard( player )
 	-- Bingo.Print( "CheckForWinningCard( "..player.." )" )
-	if not Bingo.WIN_MASKS then
-		Bingo.MakeWinMasks()
-	end
 
 	if Bingo_PlayerCards[player] then
 		for hash, cardStr in pairs( Bingo_PlayerCards[player] ) do
@@ -392,7 +470,7 @@ function Bingo.CheckForWinningCard( player )
 				-- print( place-1, value, bitCard )
 			end
 
-			for _, winMask in ipairs( Bingo.WIN_MASKS ) do
+			for _, winMask in ipairs( Bingo_CurrentGame.winMasks ) do
 				-- print( "Does "..bit.band( bitCard, winMask ).." = "..winMask.."?" )
 				if bit.band( bitCard, winMask ) == winMask then
 					Bingo.QueueMessage( player.." has won the game!" )
@@ -450,14 +528,24 @@ function Bingo.CHAT_MSG_WHISPER( self, msg, sender )
 end
 function Bingo.CHAT_MSG_( self, msg, sender )
 	msg = string.lower( msg )
+	local winner
 	-- Bingo.Print("CHAT_MSG_( "..msg..", "..sender.." )" )
 	if Bingo_CurrentGame.startedAt
 		and Bingo_CurrentGame.startedAt < time()
-		and not Bingo_CurrentGame.endedAt then
+		and not Bingo_CurrentGame.stopped then
 		if strmatch( msg, "^[!]?bingo[!]?$") then
 			if strmatch( msg, "^!" ) or strmatch( msg, "!$" ) then
 				Bingo.SendMessage( sender.." has called BINGO!", Bingo_CurrentGame.channel )
-				Bingo.CheckForWinningCard( sender )
+				if (not Bingo_CurrentGame.penalityBox)  -- no one has a penality
+						or (Bingo_CurrentGame.penalityBox[sender] and Bingo_CurrentGame.penalityBox[sender] <= time()) then  -- sender has expired penality
+					winner = Bingo.CheckForWinningCard( sender )
+				end
+				if not winner then
+					local penalitySeconds = Bingo.ballDelaySeconds * 3
+					Bingo_CurrentGame.penalityBox = Bingo_CurrentGame.penalityBox or {}
+					Bingo_CurrentGame.penalityBox[sender] = time() + penalitySeconds
+					Bingo.QueueMessage( sender.." has incurred a "..penalitySeconds.." second calling penality." )
+				end
 			end
 		end
 	end
@@ -475,9 +563,17 @@ function Bingo.ResetGame()
 	Bingo.UnregisterEvents()
 	Bingo.Print("Game has been reset")
 end
+function Bingo.SetVariant( variant )
+	if Bingo.variants[variant] then
+		Bingo_Options.variant = variant
+		Bingo.Print( "Next game is set for this variant: "..variant )
+		Bingo.Print( "Match: "..Bingo.variants[variant].text )
+	end
+end
 function Bingo.PrintHelp()
 	Bingo.Print(Bingo.MSG_ADDONNAME.." ("..Bingo.MSG_VERSION..") by "..Bingo.MSG_AUTHOR)
-	for cmd, info in pairs(Bingo.commandList) do
+	-- Bingo.Print( "Current variant: "..Bingo.variants[Bingo_Options.variant].text.." ("..Bingo_Options)
+	for cmd, info in Bingo.spairs(Bingo.commandList) do
 		if info.help then
 			local cmdStr = cmd
 			for c2, i2 in pairs(Bingo.commandList) do
@@ -546,6 +642,34 @@ Bingo.commandList = {
 	["stop"] = {
 		["alias"] = "reset",
 	},
+	["line"] = {
+		["func"] = function() Bingo.SetVariant("line") end,
+		["help"] = {"", "Set game variant to line."},
+	},
+	["box"] = {
+		["func"] = function() Bingo.SetVariant("box") end,
+		["help"] = {"", "Set game variant to box."},
+	},
+	["corners"] = {
+		["func"] = function() Bingo.SetVariant("corners") end,
+		["help"] = {"", "Set game variant to corners."},
+	},
+	["tee"] = {
+		["func"] = function() Bingo.SetVariant("tee") end,
+		["help"] = {"", "Set game variant to T."},
+	},
+	["ex"] = {
+		["func"] = function() Bingo.SetVariant("ex") end,
+		["help"] = {"", "Set game variant to X."},
+	},
+	["plus"] = {
+		["func"] = function() Bingo.SetVariant("plus") end,
+		["help"] = {"", "Set game variant to +."},
+	},
+	["full"] = {
+		["func"] = function() Bingo.SetVariant("full") end,
+		["help"] = {"", "Set game variant to full house."},
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -559,4 +683,35 @@ Bingo.bangCommands = {
 	["!tips"] = function( player )
 			Bingo.QueueMessage( Bingo.tipMessages, player )
 		end,
+	["!new"] = Bingo.AddOwnCard,
+}
+Bingo.variants = {
+	["line"] = {
+		func = Bingo.MakeWinMask_line,
+		text = "Any 1 line",
+	},
+	["box"] = {
+		func = Bingo.MakeWinMask_box,
+		text = "Box",
+	},
+	["corners"] = {
+		func = Bingo.MakeWinMask_corners,
+		text = "4 corners",
+	},
+	["tee"] = {
+		func = Bingo.MakeWinMask_tee,
+		text = "T shape",
+	},
+	["ex"] = {
+		func = Bingo.MakeWinMask_ex,
+		text = "X shape",
+	},
+	["plus"] = {
+		func = Bingo.MakeWinMask_plus,
+		text = "+ shape",
+	},
+	["full"] = {
+		func = Bingo.MakeWinMask_full,
+		text = "Full house",
+	},
 }
