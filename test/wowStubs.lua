@@ -1,7 +1,7 @@
 -----------------------------------------
 -- Author  :  Opussf
--- Date    :  December 01 2025
--- Revision:  9.7.1-2-g52b7d63
+-- Date    :  December 24 2025
+-- Revision:  9.7.1-6-ga34c899
 -----------------------------------------
 -- These are functions from wow that have been needed by addons so far
 -- Not a complete list of the functions.
@@ -371,15 +371,6 @@ end
 function bit.rshift( x, by )
 	return math.floor( x / 2 ^ by )
 end
-function bit.bor( a, b )  -- bitwise or
-	local p,c=1,0
-	while a+b>0 do
-		local ra,rb=a%2,b%2
-		if ra+rb>0 then c=c+p end
-		a,b,p=(a-ra)/2,(b-rb)/2,p*2
-	end
-	return c
-end
 function bit.bxor(a, b)
 	local res = 0
 	local bitval = 1
@@ -394,6 +385,15 @@ function bit.bxor(a, b)
 		bitval = bitval * 2
 	end
 	return res
+end
+function bit.bor( a, b )  -- bitwise or
+	local p,c=1,0
+	while a+b>0 do
+		local ra,rb=a%2,b%2
+		if ra+rb>0 then c=c+p end
+		a,b,p=(a-ra)/2,(b-rb)/2,p*2
+	end
+	return c
 end
 function bit.band( a, b ) -- bitwise and
 	local p,c=1,0
