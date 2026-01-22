@@ -1,7 +1,7 @@
 -----------------------------------------
 -- Author  :  Opussf
--- Date    :  December 01 2025
--- Revision:  9.7.1-2-g52b7d63
+-- Date    :  January 16 2026
+-- Revision:  9.7.1-8-ge2587c6
 -----------------------------------------
 -- These are functions from wow that have been needed by addons so far
 -- Not a complete list of the functions.
@@ -371,15 +371,6 @@ end
 function bit.rshift( x, by )
 	return math.floor( x / 2 ^ by )
 end
-function bit.bor( a, b )  -- bitwise or
-	local p,c=1,0
-	while a+b>0 do
-		local ra,rb=a%2,b%2
-		if ra+rb>0 then c=c+p end
-		a,b,p=(a-ra)/2,(b-rb)/2,p*2
-	end
-	return c
-end
 function bit.bxor(a, b)
 	local res = 0
 	local bitval = 1
@@ -394,6 +385,15 @@ function bit.bxor(a, b)
 		bitval = bitval * 2
 	end
 	return res
+end
+function bit.bor( a, b )  -- bitwise or
+	local p,c=1,0
+	while a+b>0 do
+		local ra,rb=a%2,b%2
+		if ra+rb>0 then c=c+p end
+		a,b,p=(a-ra)/2,(b-rb)/2,p*2
+	end
+	return c
 end
 function bit.band( a, b ) -- bitwise and
 	local p,c=1,0
@@ -983,6 +983,13 @@ function GetCategoryNumAchievements( catID )
 	-- numCompleted: Number of completed achievements (or 0 for stats)
 	-- numIncomplete: Number of incomplete achievements
 	return 5,0,5
+end
+CVars = { lastCharacterIndex = 2 }
+function GetCVar( cvarName )
+	return CVars[cvarName]
+end
+function SetCVar( cvarName, value )
+	CVars[cvarName] = value
 end
 
 C_AddOns = {}
@@ -1648,6 +1655,9 @@ end
 function ClearAchievementComparisonUnit()
 	-- mostly does nothing...
 end
+function SetItemButtonTexture( frame, iconID )
+	frame.iconID = iconID
+end
 function SetRaidTarget( target, iconID )
 	-- sets the raid icon ID on target
 end
@@ -2098,6 +2108,13 @@ end
 ----------
 C_Item = {}
 C_Item.GetItemCount = GetItemCount
+function C_Item.GetItemID( itemLocation )
+	return 7073
+end
+function C_Item.IsBound( itemLocation )
+	return false
+end
+
 
 ----------
 -- Menu
@@ -2231,12 +2248,6 @@ C_GossipInfo = {}
 function C_GossipInfo.GetFriendshipReputation( idIn )
 	return {["maxRep"]=0, ["text"]="", ["reversedColor"]=false, ["reaction"]="", ["standing"]=0, ["reactionThreshold"]=0, ["friendshipFactionID"]=0, ["textrue"]=0}
 end
-
-----------
--- C_Item
-----------
-C_Item = {}
-C_Item.GetItemCount = GetItemCount
 
 ----------
 -- Menu
@@ -2383,6 +2394,17 @@ function C_Map.GetBestMapForUnit( unitStr )
 end
 function C_Map.GetMapInfo( mapID )
 	return { mapID=5, name="map name", parentMapID=0, mapType=1, flags=2 }
+end
+
+----------
+-- ItemLocation
+----------
+ItemLocation = {}
+function ItemLocation.CreateFromBagAndSlot( self, bagID, slotID )
+	return self
+end
+function ItemLocation.IsValid( self )
+	return true
 end
 
 -----------------------------------------
