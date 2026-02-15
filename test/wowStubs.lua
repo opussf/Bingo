@@ -1626,7 +1626,7 @@ function SendAddonMessage( prefix, text, type, target )
 	-- all characters 1-255 can be used (no NULL)
 end
 function SendChatMessage( msg, chatType, language, channel )
-	error("Don't use this.")
+	error("Use C_ChatInfo.SendChatMessage instead.")
 end
 function SetAchievementComparisonUnit( lookupStr )
 	-- mostly does nothing...  Just allows INSPECT_ACHIEVEMENT_READY to happen,

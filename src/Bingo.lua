@@ -94,7 +94,7 @@ function Bingo.SendMessage( msg, target )
 		end
 
 		if( chatChannel ) then
-			SendChatMessage( msg, chatChannel, nil, toWhom ) -- toWhom will be nil for most
+			C_ChatInfo.SendChatMessage( msg, chatChannel, nil, toWhom ) -- toWhom will be nil for most
 		end
 	end
 end
