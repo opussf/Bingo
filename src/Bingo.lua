@@ -589,7 +589,7 @@ function Bingo.PrintHelp()
 	end
 end
 function Bingo.ParseCmd( msg )
-	if msg then
+	if msg and not issecretvalue(msg) then
 		msg = string.lower( msg )
 		local a,b,c = strfind( msg, "(%S+)" )  --contiguous string of non-space characters
 		if a then
