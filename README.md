@@ -81,3 +81,10 @@ On the second one, write:
 I have found that doing this, you can use the blank multiple times.
 Use different markings for each game.
 Which also means that you can use it with multiple characters, or with multiple cards.
+
+## Variants
+
+This has a fair number of variants built in.
+Many have come from talking to a nice lady on a plane about BINGO.
+She shared so many variants I would never have included before.
+A huge thanks to her for her passion for BINGO, and having a conversation with a total stranger.
