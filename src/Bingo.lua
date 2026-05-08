@@ -699,7 +699,11 @@ Bingo.commandList = {
 	["flyswatter"] = {
 		["func"] = function() Bingo.SetVariant("flyswatter") end,
 		["help"] = {"", "Set game variant to flyswatter."},
-	}
+	},
+	["pyramid"] = {
+		["func"] = function() Bingo.SetVariant("pyramid") end,
+		["help"] = {"", "Set game variant to pyramid."},
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -762,7 +766,14 @@ function Bingo.MakeWinMask_flyswatter()
 		16785383, -- 5
 	}
 end
-
+function Bingo.MakeWinMask_pyramid()
+	return {
+		1154145,  -- top
+		32968704, -- right
+		17593104, -- bottom
+		4575,     -- left
+	}
+end
 
 -- masks are bit places
 -- 0, 5, 10, 15, 20
@@ -829,9 +840,13 @@ Bingo.variants = {
 		func = Bingo.MakeWinMask_flyswatter,
 		text = "top left 3x3, All of I, and O",
 	},
-	-- ["pyramid"] = {
-	-- 	func = Bingo.MakeWinMaks_pyramid,
-	-- 	text = "any full edge, with center 3 next to it",
+	["pyramid"] = {
+		func = Bingo.MakeWinMask_pyramid,
+		text = "any full edge, with center 3 next to it",
+	},
+	-- ["star"] = {
+	-- 	func = Bingo.MakeWinMask_star,
+	-- 	text = "X and all of N",
 	-- }
 }
 
