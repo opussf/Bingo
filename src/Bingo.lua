@@ -708,6 +708,10 @@ Bingo.commandList = {
 		["func"] = function() Bingo.SetVariant("star") end,
 		["help"] = {"", "Set game variant to star."},
 	},
+	["el"] = {
+		["func"] = function() Bingo.SetVariant("el") end,
+		["help"] = {"", "Set game variant to el."},
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -783,6 +787,14 @@ function Bingo.MakeWinMask_star()
 		18185553  -- X with all of I
 	}
 end
+function Bingo.MakeWinMask_el()
+	return {
+		1082431,  -- top left
+		32539681, -- top right
+		33047056, -- bottom right
+		17318431, -- bottom left
+	}
+end
 
 -- masks are bit places
 -- 0, 5, 10, 15, 20
@@ -856,6 +868,10 @@ Bingo.variants = {
 	["star"] = {
 		func = Bingo.MakeWinMask_star,
 		text = "X and all of N",
+	},
+	["el"] = {
+		func = Bingo.MakeWinMask_el,
+		text = "L shape in any corner",
 	}
 }
 
