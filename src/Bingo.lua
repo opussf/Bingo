@@ -704,6 +704,10 @@ Bingo.commandList = {
 		["func"] = function() Bingo.SetVariant("pyramid") end,
 		["help"] = {"", "Set game variant to pyramid."},
 	},
+	["star"] = {
+		["func"] = function() Bingo.SetVariant("star") end,
+		["help"] = {"", "Set game variant to star."},
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -772,6 +776,11 @@ function Bingo.MakeWinMask_pyramid()
 		32968704, -- right
 		17593104, -- bottom
 		4575,     -- left
+	}
+end
+function Bingo.MakeWinMask_star()
+	return {
+		18185553  -- X with all of I
 	}
 end
 
@@ -844,10 +853,10 @@ Bingo.variants = {
 		func = Bingo.MakeWinMask_pyramid,
 		text = "any full edge, with center 3 next to it",
 	},
-	-- ["star"] = {
-	-- 	func = Bingo.MakeWinMask_star,
-	-- 	text = "X and all of N",
-	-- }
+	["star"] = {
+		func = Bingo.MakeWinMask_star,
+		text = "X and all of N",
+	}
 }
 
 
