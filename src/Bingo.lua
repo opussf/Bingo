@@ -672,6 +672,14 @@ Bingo.commandList = {
 		["func"] = function() Bingo.SetVariant("full") end,
 		["help"] = {"", "Set game variant to full house."},
 	},
+	["chevron"] = {
+		["func"] = function() Bingo.SetVariant("chevron") end,
+		["help"] = {"", "Set game variant to chevron."},
+	},
+	["hotdog"] = {
+		["func"] = function() Bingo.SetVariant("hotdog") end,
+		["help"] = {"", "Set game variant to hotdog."},
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -687,6 +695,42 @@ Bingo.bangCommands = {
 		end,
 	["!new"] = Bingo.AddOwnCard,
 }
+function Bingo.MakeWinMask_chevron()
+	return {
+		1118273,   -- top
+		18157568,  -- right
+		17043728,  -- bottom
+		4433      -- left
+	}
+end
+function Bingo.MakeWinMask_hotdog()
+	return { 4667844 }
+end
+function Bingo.MakeWinMask_postage()
+	return {
+		99,       -- top left
+		3244032,  -- top right
+		25952256, -- bottom right
+		792,      -- bottom left
+	}
+end
+function Bingo.MakeWinMask_kite()
+	return {
+		17043555, -- top left
+		3248400,  -- top right
+		25956417, -- bottom right
+		1119000,  -- bottom left
+	}
+end
+
+
+-- masks are bit places
+-- 0, 5, 10, 15, 20
+-- 1, 6, 11, 16, 21
+-- 2, 7, 12, 17, 22,
+-- 3, 8, 13, 18, 23,
+-- 4, 9, 14, 19, 24
+
 Bingo.variants = {
 	["line"] = {
 		func = Bingo.MakeWinMask_line,
@@ -716,4 +760,39 @@ Bingo.variants = {
 		func = Bingo.MakeWinMask_full,
 		text = "Full house",
 	},
+	["chevron"] = {
+		func = Bingo.MakeWinMask_chevron,
+		text = "Chevon, any 2 adjacent corners to center",
+	},
+	-- -- ["L"] = { }
+	["hotdog"] = {
+		func = Bingo.MakeWinMask_hotdog,
+		text = "center 3x3, with center B and O",
+	},
+	-- ["postage"] = {
+	-- 	func = Bingo.MakeWinMask_postage,
+	-- 	text = "2x2 square in any corner",
+	-- },
+	-- ["kite"] = {
+	-- 	func = Bingo.MakeWinMask_kite,
+	-- 	text = "2x2 corner square with connected diagonal line",
+	-- }
+	-- ["flagpoles"] = {
+	-- 	func = Bingo.MakeWinMask_flagpoles,
+	-- 	text = "X with adjacent 2x2 corners",
+	-- }
+	-- ["sputnik"] = {
+	-- 	func = Bingo.MakeWinMask_sputnik,
+	-- 	text = "center 3x3 with corners",
+	-- },
+	-- ["flyswatter"] = {
+	-- 	func = Bingo.MakeWinMask_swatter,
+	-- 	text = "top left 3x3, All of I, and O",
+	-- },
+	-- ["pyramid"] = {
+	-- 	func = Bingo.MakeWinMaks_pyramid,
+	-- 	text = "any full edge, with center 3 next to it",
+	-- }
 }
+
+

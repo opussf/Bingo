@@ -20,6 +20,12 @@ end
 function test.after()
 end
 
+function test.setPicked( tPickedNumbers )
+	for _, picked in ipairs(tPickedNumbers) do
+		Bingo_CurrentGame.picked[picked] = true
+	end
+end
+
 ----------
 -- Tests
 function test.test_helpFunction()
@@ -769,6 +775,86 @@ function test.test_new_create_playerCard_cardIsDuplicate()
 	assertEquals( "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66", Bingo_PlayerCards["New-Card"]["e1211770"] )
 	assertEquals( "e1211770 is already your card.", Bingo.messageQueue["New-Card"].queue[1] )
 end
+
+--------- More variants
+function test.test_windetect_chevron_top()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
+	Bingo.Command( "chevron" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+
+	Bingo_CurrentGame.picked = { [14] = true, [19] = true, [59] = true, [67] = true}
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_chevron_bottom()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "chevron" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+
+	Bingo_CurrentGame.picked = { [9] = true, [29] = true, [57] = true, [66] = true}
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_chevron_left()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "chevron" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+
+	Bingo_CurrentGame.picked = { [14] = true, [9] = true, [19] = true, [29] = true}
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_chevron_right()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "chevron" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	test.setPicked({59,57,67,66})
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_hotdog()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "hotdog" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	test.setPicked({5,19,30,29,40,31,59,46,57,72})
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_postage()
+end
+function test.test_windetect_kite()
+end
+
 
 --------- Corner cases
 function test.test_gameStructureIsRemade()
