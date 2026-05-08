@@ -680,6 +680,10 @@ Bingo.commandList = {
 		["func"] = function() Bingo.SetVariant("hotdog") end,
 		["help"] = {"", "Set game variant to hotdog."},
 	},
+	["postage"] = {
+		["func"] = function() Bingo.SetVariant("postage") end,
+		["help"] = {"", "Set game variant to postage."},
+	},
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -769,10 +773,10 @@ Bingo.variants = {
 		func = Bingo.MakeWinMask_hotdog,
 		text = "center 3x3, with center B and O",
 	},
-	-- ["postage"] = {
-	-- 	func = Bingo.MakeWinMask_postage,
-	-- 	text = "2x2 square in any corner",
-	-- },
+	["postage"] = {
+		func = Bingo.MakeWinMask_postage,
+		text = "2x2 square in any corner",
+	},
 	-- ["kite"] = {
 	-- 	func = Bingo.MakeWinMask_kite,
 	-- 	text = "2x2 corner square with connected diagonal line",

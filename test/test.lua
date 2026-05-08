@@ -850,7 +850,61 @@ function test.test_windetect_hotdog()
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
 	assertTrue( Bingo_CurrentGame.stopped )
 end
-function test.test_windetect_postage()
+function test.test_windetect_postage_topleft()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "postage" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	test.setPicked({14,10,23,19})
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_postage_topright()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "postage" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	test.setPicked({49,59,67,73})
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_postage_bottomright()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "postage" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	test.setPicked({57,58,68,66})
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_postage_bottomleft()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "postage" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	test.setPicked({1,9,29,17})
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
 end
 function test.test_windetect_kite()
 end
