@@ -688,6 +688,10 @@ Bingo.commandList = {
 		["func"] = function() Bingo.SetVariant("kite") end,
 		["help"] = {"", "Set game variant to kite."},
 	},
+	["flagpoles"] = {
+		["func"] = function() Bingo.SetVariant("flagpoles") end,
+		["help"] = {"", "Set game variant to flagpoles."},
+	}
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -728,6 +732,14 @@ function Bingo.MakeWinMask_kite()
 		3248400,  -- top right
 		25956417, -- bottom right
 		1119000   -- bottom left
+	}
+end
+function Bingo.MakeWinMask_flagpoles()
+	return {
+		20287859, -- top
+		29200721, -- right
+		27071321, -- bottom
+		18158459, -- left
 	}
 end
 
@@ -784,11 +796,11 @@ Bingo.variants = {
 	["kite"] = {
 		func = Bingo.MakeWinMask_kite,
 		text = "2x2 corner square with connected diagonal line",
+	},
+	["flagpoles"] = {
+		func = Bingo.MakeWinMask_flagpoles,
+		text = "X with adjacent 2x2 corners",
 	}
-	-- ["flagpoles"] = {
-	-- 	func = Bingo.MakeWinMask_flagpoles,
-	-- 	text = "X with adjacent 2x2 corners",
-	-- }
 	-- ["sputnik"] = {
 	-- 	func = Bingo.MakeWinMask_sputnik,
 	-- 	text = "center 3x3 with corners",
