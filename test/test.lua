@@ -363,7 +363,7 @@ function test.test_stopGame()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [10] = true, [19] = true, [40] = true, [59] = true, [73] = true }
+	test.setPicked({10,19,40,59,73})
 	Bingo.Command( "stop" )
 	assertIsNil( Bingo_CurrentGame.ball )
 	-- assertEquals( {}, Bingo_CurrentGame )
@@ -516,7 +516,7 @@ function test.test_windetect_tee_top()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [14] = true, [23] = true, [43] = true, [40] = true, [31] = true, [37] = true, [49] = true, [67] = true }
+	test.setPicked({14,23,43,40,31,37,49,67})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -530,7 +530,7 @@ function test.test_windetect_tee_top_fail()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [14] = true, [23] = true, [43] = true, [40] = true, [31] = true, [17] = true, [49] = true, [67] = true }
+	test.setPicked({14,23,43,40,31,17,49,67})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertIsNil( Bingo_CurrentGame.winner )
 	assertIsNil( Bingo_CurrentGame.endedAt )
@@ -544,7 +544,7 @@ function test.test_windetect_tee_left()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [14] = true, [10] = true, [5] = true, [1] = true, [9] = true, [30] = true, [46] = true, [72] = true }
+	test.setPicked({14,10,5,1,9,30,46,72})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -558,7 +558,7 @@ function test.test_windetect_tee_left_fail()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [14] = true, [10] = true, [1] = true, [9] = true, [30] = true, [46] = true, [72] = true }
+	test.setPicked({14,10,1,9,30,46,72})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertIsNil( Bingo_CurrentGame.winner )
 	assertIsNil( Bingo_CurrentGame.endedAt )
@@ -572,7 +572,7 @@ function test.test_windetect_tee_bottom()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [9] = true, [17] = true, [43] = true, [40] = true, [31] = true, [37] = true, [58] = true, [66] = true }
+	test.setPicked({9,17,43,40,31,37,58,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -586,7 +586,7 @@ function test.test_windetect_tee_bottom_fail()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [9] = true, [17] = true, [43] = true, [40] = true, [31] = true, [36] = true, [58] = true, [66] = true }
+	test.setPicked({9,17,43,40,31,36,58,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertIsNil( Bingo_CurrentGame.winner )
 	assertIsNil( Bingo_CurrentGame.endedAt )
@@ -600,7 +600,7 @@ function test.test_windetect_tee_right()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [5] = true, [30] = true, [46] = true, [67] = true, [73] = true, [72] = true, [68] = true, [66] = true }
+	test.setPicked({5,30,46,67,73,72,68,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -614,7 +614,7 @@ function test.test_windetect_tee_right_fail()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [5] = true, [30] = true, [46] = true, [49] = true, [73] = true, [72] = true, [68] = true, [66] = true }
+	test.setPicked({5,30,46,49,73,72,68,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertIsNil( Bingo_CurrentGame.winner )
 	assertIsNil( Bingo_CurrentGame.endedAt )
@@ -628,7 +628,7 @@ function test.test_windetect_ex()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [14] = true, [9] = true, [19] = true, [29] = true, [59] = true, [57] = true, [67] = true, [66] = true }
+	test.setPicked({14,9,19,29,59,57,67,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -642,7 +642,7 @@ function test.test_windetect_ex_fail()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [14] = true, [9] = true, [19] = true, [29] = true, [58] = true, [57] = true, [67] = true, [66] = true }
+	test.setPicked({14,9,19,29,58,57,67,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertIsNil( Bingo_CurrentGame.winner )
 	assertIsNil( Bingo_CurrentGame.endedAt )
@@ -656,7 +656,7 @@ function test.test_windetect_plus()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [5] = true, [30] = true, [43] = true, [40] = true, [31] = true, [37] = true, [46] = true, [72] = true }
+	test.setPicked({5,30,43,40,31,37,46,72})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -670,7 +670,7 @@ function test.test_windetect_plus_fail()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [5] = true, [30] = true, [43] = true, [40] = true, [31] = true, [32] = true, [46] = true, [72] = true }
+	test.setPicked({5,30,43,40,31,32,46,72})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertIsNil( Bingo_CurrentGame.winner )
 	assertIsNil( Bingo_CurrentGame.endedAt )
@@ -684,11 +684,7 @@ function test.test_windetect_full()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [14] = true, [10] = true,  [5] = true,  [1] = true,  [9] = true,
-								 [23] = true, [19] = true, [30] = true, [29] = true, [17] = true,
-								 [43] = true, [40] = true,              [31] = true, [37] = true,
-								 [49] = true, [59] = true, [46] = true, [57] = true, [58] = true,
-								 [67] = true, [73] = true, [72] = true, [68] = true, [66] = true }
+	test.setPicked({14,10,5,1,9,23,19,30,29,17,43,40,31,37,49,59,46,57,58,67,73,72,68,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -702,11 +698,7 @@ function test.test_windetect_full_fail()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [14] = true, [10] = true,  [5] = true,  [1] = true,  [9] = true,
-								 [23] = true, [19] = true, [30] = true, [29] = true, [17] = true,
-								 [43] = true, [40] = true,              [31] = true, [37] = true,
-								 [48] = true, [59] = true, [46] = true, [57] = true, [58] = true,
-								 [67] = true, [73] = true, [72] = true, [68] = true, [66] = true }
+	test.setPicked({14,10,5,1,9,23,19,30,29,17,43,40,31,37,48,59,46,57,58,67,73,72,68,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertIsNil( Bingo_CurrentGame.winner )
 	assertIsNil( Bingo_CurrentGame.endedAt )
@@ -783,8 +775,7 @@ function test.test_windetect_chevron_top()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-
-	Bingo_CurrentGame.picked = { [14] = true, [19] = true, [59] = true, [67] = true}
+	test.setPicked({14,19,59,67})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -798,8 +789,7 @@ function test.test_windetect_chevron_bottom()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-
-	Bingo_CurrentGame.picked = { [9] = true, [29] = true, [57] = true, [66] = true}
+	test.setPicked({9,29,57,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -1187,7 +1177,7 @@ function test.test_b19_second_player_calling_bingo_should_not_also_win()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-	Bingo_CurrentGame.picked = { [1] = true, [14] = true, [19] = true, [57] = true, [66] = true, }
+	test.setPicked({1,14,19,57,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -1202,11 +1192,9 @@ function test.test_b31_all_balls_spent_bingo_does_not_work()
 	Bingo_CurrentGame.startedAt = time()-65
 	Bingo_CurrentGame.lastBallAt = time()-8
 	Bingo_CurrentGame.ball = { 75 }
-	Bingo_CurrentGame.picked = { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-								 true, true, true, true, true, true, true, true, true, true, true, true, true, true }
+	test.setPicked({1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,
+					31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,
+					61,62,63,64,65,66,67,68,69,70,71,72,73,74})
 	Bingo.OnUpdate()
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
@@ -1220,11 +1208,9 @@ function test.test_stopped_game_is_stopped()
 	Bingo_CurrentGame.startedAt = time()-65
 	Bingo_CurrentGame.lastBallAt = time()-8
 	Bingo_CurrentGame.ball = { 75 }
-	Bingo_CurrentGame.picked = { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-								 true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-								 true, true, true, true, true, true, true, true, true, true, true, true, true, true }
+	test.setPicked({1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,
+					31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,
+					61,62,63,64,65,66,67,68,69,70,71,72,73,74})
 	Bingo.OnUpdate()
 	Bingo_CurrentGame.endedAt = time()-31
 	Bingo_CurrentGame.stopped = true
