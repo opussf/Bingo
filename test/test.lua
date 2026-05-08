@@ -815,8 +815,7 @@ function test.test_windetect_chevron_left()
 	Bingo.initAt = time()-65
 	Bingo_CurrentGame.startedAt = time()-5
 	Bingo_CurrentGame.lastBallAt = time()
-
-	Bingo_CurrentGame.picked = { [14] = true, [9] = true, [19] = true, [29] = true}
+	test.setPicked({14,9,19,29})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
@@ -906,9 +905,62 @@ function test.test_windetect_postage_bottomleft()
 	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
 	assertTrue( Bingo_CurrentGame.stopped )
 end
-function test.test_windetect_kite()
+function test.test_windetect_kite_topleft()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "kite" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	test.setPicked({14,10,23,19,57,66})
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
 end
-
+function test.test_windetect_kite_topright()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "kite" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	test.setPicked({9,29,49,59,67,73})
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_kite_bottomright()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "kite" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	test.setPicked({14,19,57,58,68,66})
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
+function test.test_windetect_kite_bottomleft()
+	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9, 23,19,30,29,17, 43,40,0,31,37, 49,59,46,57,58, 67,73,72,68,66",}
+	Bingo.Command( "kite" )
+	-- setup the game
+	Bingo.Command( "say" )
+	Bingo.initAt = time()-65
+	Bingo_CurrentGame.startedAt = time()-5
+	Bingo_CurrentGame.lastBallAt = time()
+	test.setPicked({1,9,29,17,59,67})
+	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
+	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertTrue( Bingo_CurrentGame.stopped )
+end
 
 --------- Corner cases
 function test.test_gameStructureIsRemade()
