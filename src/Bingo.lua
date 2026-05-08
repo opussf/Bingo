@@ -696,6 +696,10 @@ Bingo.commandList = {
 		["func"] = function() Bingo.SetVariant("sputnik") end,
 		["help"] = {"", "Set game variant to sputnik."},
 	},
+	["flyswatter"] = {
+		["func"] = function() Bingo.SetVariant("flyswatter") end,
+		["help"] = {"", "Set game variant to flyswatter."},
+	}
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -748,6 +752,15 @@ function Bingo.MakeWinMask_flagpoles()
 end
 function Bingo.MakeWinMask_sputnik()
 	return { 18299345 }
+end
+function Bingo.MakeWinMask_flyswatter()
+	return {
+		1056743,  -- 1
+		2105319,  -- 2
+		4202471,  -- 3
+		8396775,  -- 4
+		16785383, -- 5
+	}
 end
 
 
@@ -812,10 +825,10 @@ Bingo.variants = {
 		func = Bingo.MakeWinMask_sputnik,
 		text = "center 3x3 with corners",
 	},
-	-- ["flyswatter"] = {
-	-- 	func = Bingo.MakeWinMask_swatter,
-	-- 	text = "top left 3x3, All of I, and O",
-	-- },
+	["flyswatter"] = {
+		func = Bingo.MakeWinMask_flyswatter,
+		text = "top left 3x3, All of I, and O",
+	},
 	-- ["pyramid"] = {
 	-- 	func = Bingo.MakeWinMaks_pyramid,
 	-- 	text = "any full edge, with center 3 next to it",
