@@ -105,3 +105,10 @@ Bingo.variants["el"] = {
     end,
 	text = "L shape in any corner",
 }
+Bingo.variants["bowtie"] = {
+    func = function() return {
+        25952355,   -- \
+        3244824 }   -- /
+    end,
+    text = "2x2 square in opposite corners"
+}
