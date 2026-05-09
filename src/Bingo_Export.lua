@@ -50,7 +50,7 @@ function ExportJSON()
 	cardsOut = {}
 
 	for id, card in sorted_pairs( cards ) do
-		table.insert( cardsOut, string.format( "\t{\"id\":\"%s\", \"card\":\"%s\"}", id, card ) )
+		table.insert( cardsOut, string.format( "{\"id\":\"%s\", \"card\":\"%s\"}", id, card ) )
 	end
 
 	strOut = strOut .. table.concat( cardsOut, ",\n" ) .. "\n]}"
