@@ -34,15 +34,15 @@ function BuildCardData()
 	end
 end
 function ExportXML()
-	strOut = "<?xml version='1.0' encoding='utf-8' ?>\n"
-	strOut = strOut .. "<cards>\n"
+	tOut = { "<?xml version='1.0' encoding='utf-8' ?>\n" }
+	tOut[#tOut+1] = "<cards>\n"
 
 	for id, card in sorted_pairs( cards ) do
-		strOut = strOut .. string.format( "<card id=\"%s\">%s</card>\n", id, card )
+		tOut[#tOut+1] = string.format( "<card id=\"%s\">%s</card>\n", id, card )
 	end
 
-	strOut = strOut .. "</cards>\n"
-	return strOut
+	tOut[#tOut+1] = "</cards>\n"
+	return table.concat( tOut, "" )
 end
 function ExportJSON()
 	strOut = "{\"cards\": [\n"
@@ -50,7 +50,7 @@ function ExportJSON()
 	cardsOut = {}
 
 	for id, card in sorted_pairs( cards ) do
-		table.insert( cardsOut, string.format( "\t{\"id\":\"%s\", \"card\":\"%s\"}", id, card ) )
+		table.insert( cardsOut, string.format( "{\"id\":\"%s\", \"card\":\"%s\"}", id, card ) )
 	end
 
 	strOut = strOut .. table.concat( cardsOut, ",\n" ) .. "\n]}"
