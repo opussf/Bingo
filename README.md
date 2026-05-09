@@ -88,3 +88,8 @@ This has a fair number of variants built in.
 Many have come from talking to a nice lady on a plane about BINGO.
 She shared so many variants I would never have included before.
 A huge thanks to her for her passion for BINGO, and having a conversation with a total stranger.
+
+To add a new variant, add a new key and structure to `Bingo.variants`.
+Please see `Bingo_Variants.lua`.
+
+Note: ["func"] can be a function reference if you feel the function to return the bit masks is more complex than comfortably fits in the structure.
