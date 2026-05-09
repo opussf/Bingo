@@ -112,3 +112,12 @@ Bingo.variants["bowtie"] = {
     end,
     text = "2x2 square in opposite corners"
 }
+Bingo.variants["arrowhead"] = {
+    func = function() return {
+        1127,     -- top left
+        7439360,  -- top right
+        30162944, -- bottom right
+        17180 }   -- bottom left
+    end,
+    text = "3x3 triangle pointing in corner"
+}
