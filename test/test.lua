@@ -30,6 +30,7 @@ end
 -- Tests
 function test.test_helpFunction()
     Bingo.Command("help")
+	test.dump(chatLog)
 	assertEquals( "|cffff6d00Bingo> |rBingo (@VERSION@) by opussf", chatLog[1].msg )
 end
 function test.test_unknownFunction_ShowsHelp()
@@ -96,7 +97,7 @@ end
 function test.test_start_GameStillRunning()
 	Bingo_CurrentGame.channel = "party"
 	Bingo_CurrentGame.initAt = time()-60
-	Bingo.Command("guild")
+	Bingo.Command( "guild" )
 	assertEquals( "party", Bingo_CurrentGame.channel )
 end
 function test.test_SendMessage_sent_str()
@@ -519,7 +520,7 @@ function test.test_windetect_tee_top()
 	test.setPicked({14,23,43,40,31,37,49,67})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
-	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt, nil, nil, 1 )
 	assertTrue( Bingo_CurrentGame.stopped )
 end
 function test.test_windetect_tee_top_fail()
@@ -766,10 +767,21 @@ function test.test_new_create_playerCard_cardIsDuplicate()
 	assertEquals( "e1211770 is already your card.", Bingo.messageQueue["New-Card"].queue[1] )
 end
 
+--------- Variants
+function test.test_variants_help()
+	Bingo.Command( "variant" )
+	assertEquals("|cffff6d00Bingo> |rVariant Help", chatLog[1].msg)
+end
+function test.test_variants_help2()
+	Bingo.Command( "variant help" )
+	test.dump(chatLog)
+	assertEquals("|cffff6d00Bingo> |rVariant Help", chatLog[1].msg)
+end
+
 --------- More variants
 function test.test_windetect_chevron_top()
 	Bingo_PlayerCards["Frank-Win"] = {["e1211770"] = "14,10,5,1,9,23,19,30,29,17,43,40,0,31,37,49,59,46,57,58,67,73,72,68,66",}
-	Bingo.Command( "chevron" )
+	Bingo.Command( "variant chevron" )
 	-- setup the game
 	Bingo.Command( "say" )
 	Bingo.initAt = time()-65

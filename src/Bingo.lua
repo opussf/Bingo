@@ -431,9 +431,6 @@ function Bingo.MakeWinMask_line()
 											bit.lshift( 1, 20 ) ) ) ) ) )
 	return winMasks
 end
-function Bingo.MakeWinMask_box()
-	return { 33080895 }
-end
 function Bingo.MakeWinMask_corners()
 	return { 17825809 }
 end
@@ -570,6 +567,12 @@ function Bingo.SetVariant( variant )
 		Bingo_Options.variant = variant
 		Bingo.Print( "Next game is set for this variant: "..variant )
 		Bingo.Print( "Match: "..Bingo.variants[variant].text )
+	else
+		Bingo.Print( "Variant Help" )
+		Bingo.Print( "These are the current variants:" )
+		for k, s in Bingo.spairs( Bingo.variants ) do
+			Bingo.Print( string.format( " %s -> %s", k, s.text ), false )
+		end
 	end
 end
 function Bingo.PrintHelp()
@@ -608,6 +611,8 @@ function Bingo.Command( msg )
 	local cmdFunc = Bingo.commandList[cmd];
 	if cmdFunc then
 		cmdFunc.func(param);
+	elseif Bingo.variants[msg] then
+		Bingo.SetVariant(msg)
 	else
 		Bingo.PrintHelp()
 	end
@@ -644,74 +649,70 @@ Bingo.commandList = {
 	["stop"] = {
 		["alias"] = "reset",
 	},
-	["line"] = {
-		["func"] = function() Bingo.SetVariant("line") end,
-		["help"] = {"", "Set game variant to line."},
+	["variant"] = {
+		["func"] = Bingo.SetVariant,
+		["help"] = {"<variant>", "Set game variant. 'help' for help"},
 	},
-	["box"] = {
-		["func"] = function() Bingo.SetVariant("box") end,
-		["help"] = {"", "Set game variant to box."},
-	},
-	["corners"] = {
-		["func"] = function() Bingo.SetVariant("corners") end,
-		["help"] = {"", "Set game variant to corners."},
-	},
-	["tee"] = {
-		["func"] = function() Bingo.SetVariant("tee") end,
-		["help"] = {"", "Set game variant to T."},
-	},
-	["ex"] = {
-		["func"] = function() Bingo.SetVariant("ex") end,
-		["help"] = {"", "Set game variant to X."},
-	},
-	["plus"] = {
-		["func"] = function() Bingo.SetVariant("plus") end,
-		["help"] = {"", "Set game variant to +."},
-	},
-	["full"] = {
-		["func"] = function() Bingo.SetVariant("full") end,
-		["help"] = {"", "Set game variant to full house."},
-	},
-	["chevron"] = {
-		["func"] = function() Bingo.SetVariant("chevron") end,
-		["help"] = {"", "Set game variant to chevron."},
-	},
-	["hotdog"] = {
-		["func"] = function() Bingo.SetVariant("hotdog") end,
-		["help"] = {"", "Set game variant to hotdog."},
-	},
-	["postage"] = {
-		["func"] = function() Bingo.SetVariant("postage") end,
-		["help"] = {"", "Set game variant to postage."},
-	},
-	["kite"] = {
-		["func"] = function() Bingo.SetVariant("kite") end,
-		["help"] = {"", "Set game variant to kite."},
-	},
-	["flagpoles"] = {
-		["func"] = function() Bingo.SetVariant("flagpoles") end,
-		["help"] = {"", "Set game variant to flagpoles."},
-	},
-	["sputnik"] = {
-		["func"] = function() Bingo.SetVariant("sputnik") end,
-		["help"] = {"", "Set game variant to sputnik."},
-	},
-	["flyswatter"] = {
-		["func"] = function() Bingo.SetVariant("flyswatter") end,
-		["help"] = {"", "Set game variant to flyswatter."},
-	},
-	["pyramid"] = {
-		["func"] = function() Bingo.SetVariant("pyramid") end,
-		["help"] = {"", "Set game variant to pyramid."},
-	},
-	["star"] = {
-		["func"] = function() Bingo.SetVariant("star") end,
-		["help"] = {"", "Set game variant to star."},
-	},
-	["el"] = {
-		["func"] = function() Bingo.SetVariant("el") end,
-		["help"] = {"", "Set game variant to el."},
-	},
+	-- ["corners"] = {
+	-- 	["func"] = function() Bingo.SetVariant("corners") end,
+	-- 	["help"] = {"", "Set game variant to corners."},
+	-- },
+	-- ["tee"] = {
+	-- 	["func"] = function() Bingo.SetVariant("tee") end,
+	-- 	["help"] = {"", "Set game variant to T."},
+	-- },
+	-- ["ex"] = {
+	-- 	["func"] = function() Bingo.SetVariant("ex") end,
+	-- 	["help"] = {"", "Set game variant to X."},
+	-- },
+	-- ["plus"] = {
+	-- 	["func"] = function() Bingo.SetVariant("plus") end,
+	-- 	["help"] = {"", "Set game variant to +."},
+	-- },
+	-- ["full"] = {
+	-- 	["func"] = function() Bingo.SetVariant("full") end,
+	-- 	["help"] = {"", "Set game variant to full house."},
+	-- },
+	-- ["chevron"] = {
+	-- 	["func"] = function() Bingo.SetVariant("chevron") end,
+	-- 	["help"] = {"", "Set game variant to chevron."},
+	-- },
+	-- ["hotdog"] = {
+	-- 	["func"] = function() Bingo.SetVariant("hotdog") end,
+	-- 	["help"] = {"", "Set game variant to hotdog."},
+	-- },
+	-- ["postage"] = {
+	-- 	["func"] = function() Bingo.SetVariant("postage") end,
+	-- 	["help"] = {"", "Set game variant to postage."},
+	-- },
+	-- ["kite"] = {
+	-- 	["func"] = function() Bingo.SetVariant("kite") end,
+	-- 	["help"] = {"", "Set game variant to kite."},
+	-- },
+	-- ["flagpoles"] = {
+	-- 	["func"] = function() Bingo.SetVariant("flagpoles") end,
+	-- 	["help"] = {"", "Set game variant to flagpoles."},
+	-- },
+	-- ["sputnik"] = {
+	-- 	["func"] = function() Bingo.SetVariant("sputnik") end,
+	-- 	["help"] = {"", "Set game variant to sputnik."},
+	-- },
+	-- ["flyswatter"] = {
+	-- 	["func"] = function() Bingo.SetVariant("flyswatter") end,
+	-- 	["help"] = {"", "Set game variant to flyswatter."},
+	-- },
+	-- ["pyramid"] = {
+	-- 	["func"] = function() Bingo.SetVariant("pyramid") end,
+	-- 	["help"] = {"", "Set game variant to pyramid."},
+	-- },
+	-- ["star"] = {
+	-- 	["func"] = function() Bingo.SetVariant("star") end,
+	-- 	["help"] = {"", "Set game variant to star."},
+	-- },
+	-- ["el"] = {
+	-- 	["func"] = function() Bingo.SetVariant("el") end,
+	-- 	["help"] = {"", "Set game variant to el."},
+	-- },
 }
 Bingo.bangCommands = {
 	["!help"] = function( player )
@@ -808,71 +809,67 @@ Bingo.variants = {
 		func = Bingo.MakeWinMask_line,
 		text = "Any 1 line",
 	},
-	["box"] = {
-		func = Bingo.MakeWinMask_box,
-		text = "Box",
-	},
-	["corners"] = {
-		func = Bingo.MakeWinMask_corners,
-		text = "4 corners",
-	},
-	["tee"] = {
-		func = Bingo.MakeWinMask_tee,
-		text = "T shape",
-	},
-	["ex"] = {
-		func = Bingo.MakeWinMask_ex,
-		text = "X shape",
-	},
-	["plus"] = {
-		func = Bingo.MakeWinMask_plus,
-		text = "+ shape",
-	},
-	["full"] = {
-		func = Bingo.MakeWinMask_full,
-		text = "Full house",
-	},
-	["chevron"] = {
-		func = Bingo.MakeWinMask_chevron,
-		text = "Chevon, any 2 adjacent corners to center",
-	},
-	-- -- ["L"] = { }
-	["hotdog"] = {
-		func = Bingo.MakeWinMask_hotdog,
-		text = "center 3x3, with center B and O",
-	},
-	["postage"] = {
-		func = Bingo.MakeWinMask_postage,
-		text = "2x2 square in any corner",
-	},
-	["kite"] = {
-		func = Bingo.MakeWinMask_kite,
-		text = "2x2 corner square with connected diagonal line",
-	},
-	["flagpoles"] = {
-		func = Bingo.MakeWinMask_flagpoles,
-		text = "X with adjacent 2x2 corners",
-	},
-	["sputnik"] = {
-		func = Bingo.MakeWinMask_sputnik,
-		text = "center 3x3 with corners",
-	},
-	["flyswatter"] = {
-		func = Bingo.MakeWinMask_flyswatter,
-		text = "top left 3x3, All of I, and O",
-	},
-	["pyramid"] = {
-		func = Bingo.MakeWinMask_pyramid,
-		text = "any full edge, with center 3 next to it",
-	},
-	["star"] = {
-		func = Bingo.MakeWinMask_star,
-		text = "X and all of N",
-	},
-	["el"] = {
-		func = Bingo.MakeWinMask_el,
-		text = "L shape in any corner",
-	}
+	-- ["corners"] = {
+	-- 	func = Bingo.MakeWinMask_corners,
+	-- 	text = "4 corners",
+	-- },
+	-- ["tee"] = {
+	-- 	func = Bingo.MakeWinMask_tee,
+	-- 	text = "T shape",
+	-- },
+	-- ["ex"] = {
+	-- 	func = Bingo.MakeWinMask_ex,
+	-- 	text = "X shape",
+	-- },
+	-- ["plus"] = {
+	-- 	func = Bingo.MakeWinMask_plus,
+	-- 	text = "+ shape",
+	-- },
+	-- ["full"] = {
+	-- 	func = Bingo.MakeWinMask_full,
+	-- 	text = "Full house",
+	-- },
+	-- ["chevron"] = {
+	-- 	func = Bingo.MakeWinMask_chevron,
+	-- 	text = "Chevon, any 2 adjacent corners to center",
+	-- },
+	-- -- -- ["L"] = { }
+	-- ["hotdog"] = {
+	-- 	func = Bingo.MakeWinMask_hotdog,
+	-- 	text = "center 3x3, with center B and O",
+	-- },
+	-- ["postage"] = {
+	-- 	func = Bingo.MakeWinMask_postage,
+	-- 	text = "2x2 square in any corner",
+	-- },
+	-- ["kite"] = {
+	-- 	func = Bingo.MakeWinMask_kite,
+	-- 	text = "2x2 corner square with connected diagonal line",
+	-- },
+	-- ["flagpoles"] = {
+	-- 	func = Bingo.MakeWinMask_flagpoles,
+	-- 	text = "X with adjacent 2x2 corners",
+	-- },
+	-- ["sputnik"] = {
+	-- 	func = Bingo.MakeWinMask_sputnik,
+	-- 	text = "center 3x3 with corners",
+	-- },
+	-- ["flyswatter"] = {
+	-- 	func = Bingo.MakeWinMask_flyswatter,
+	-- 	text = "top left 3x3, All of I, and O",
+	-- },
+	-- ["pyramid"] = {
+	-- 	func = Bingo.MakeWinMask_pyramid,
+	-- 	text = "any full edge, with center 3 next to it",
+	-- },
+	-- ["star"] = {
+	-- 	func = Bingo.MakeWinMask_star,
+	-- 	text = "X and all of N",
+	-- },
+	-- ["el"] = {
+	-- 	func = Bingo.MakeWinMask_el,
+	-- 	text = "L shape in any corner",
+	-- }
 }
 
 
