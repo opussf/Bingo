@@ -30,7 +30,6 @@ end
 -- Tests
 function test.test_helpFunction()
     Bingo.Command("help")
-	test.dump(chatLog)
 	assertEquals( "|cffff6d00Bingo> |rBingo (@VERSION@) by opussf", chatLog[1].msg )
 end
 function test.test_unknownFunction_ShowsHelp()
@@ -774,7 +773,6 @@ function test.test_variants_help()
 end
 function test.test_variants_help2()
 	Bingo.Command( "variant help" )
-	test.dump(chatLog)
 	assertEquals("|cffff6d00Bingo> |rVariant Help", chatLog[1].msg)
 end
 
