@@ -8,3 +8,4 @@
 ## SavedVariablesPerCharacter:
 Bingo.lua
 Bingo.xml
+Bingo_Variants.lua
