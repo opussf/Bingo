@@ -775,6 +775,15 @@ function test.test_variants_help2()
 	Bingo.Command( "variant help" )
 	assertEquals("|cffff6d00Bingo> |rVariant Help", chatLog[1].msg)
 end
+function test.test_variants_unknown()
+	-- set saved variant to box
+	Bingo_Options.variant = "box"
+	-- set variant unknown
+	Bingo.Command( "variant unknown" )
+	-- start game
+	Bingo.Command( "say" )
+	assertEquals( "box", Bingo_CurrentGame.variant, "Current game should still be box variant")
+end
 
 --------- More variants
 function test.test_windetect_chevron_top()
