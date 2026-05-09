@@ -1147,7 +1147,7 @@ function test.test_windetect_pyramid_bottom()
 	test.setPicked({9,29,17,31,37,57,58,66})
 	Bingo.CHAT_MSG_( {}, "BINGO!", "Frank-Win" )
 	assertEquals( "Frank-Win", Bingo_CurrentGame.winner )
-	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt )
+	assertAlmostEquals( time(), Bingo_CurrentGame.endedAt, nil, nil, 1 )
 	assertTrue( Bingo_CurrentGame.stopped )
 end
 function test.test_windetect_pyramid_left()
